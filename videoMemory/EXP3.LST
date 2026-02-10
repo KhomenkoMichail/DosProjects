@@ -1,0 +1,64 @@
+Turbo Assembler	 Version 4.1	    02/10/26 14:39:16	    Page 1
+exp3.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3
+      4				     org 100h
+      5	0100  B8 B800		     Start:		     mov ax, 0b800h
+      6	0103  8E C0					     mov es, ax
+      7	0105  33 DB					     xor bx, bx
+      8
+      9	0107  B9 001A					     mov cx, 26d
+     10
+     11	010A			     loop_start:
+     12	010A  26: C6 07	41				     mov byte ptr es:[bx], 65d
+     13	010E  26: C7 47	01 0081				     mov es:[bx+1],(0001b or 80h)
+*Warning* exp3.asm(13) Argument	needs type override
+     14	0114  81 C3 00A0				     add bx, 80d*2
+     15	0118  E2 F0					     loop loop_start
+     16
+     17	011A  B8 4C00					     mov ax, 4c00h
+     18	011D  CD 21					     int 21h
+     19				     end Start
+Turbo Assembler	 Version 4.1	    02/10/26 14:39:16	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/10/26"
+??FILENAME			  Text	 "exp3	  "
+??TIME				  Text	 "14:39:16"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 EXP3
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+LOOP_START			  Near	 DGROUP:010A
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  011F Word	  Public  CODE
+Turbo Assembler	 Version 4.1	    02/10/26 14:39:16	    Page 3
+Error Summary
+
+
+
+*Warning* exp3.asm(13) Argument	needs type override
+

@@ -1,0 +1,64 @@
+Turbo Assembler	 Version 4.1	    02/10/26 15:15:14	    Page 1
+exp4.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5
+      6	0100  B8 B800		     Start:		     mov ax, 0b800h
+      7	0103  8E C0					     mov es, ax
+      8	0105  BB 0654					     mov bx, 80d*2*10+10*2
+      9
+     10	0108  BE 011Cr					     mov si, offset Hello
+     11
+     12	010B  B9 000D					     mov cx, 13d
+     13
+     14	010E			     loop_start:
+     15	010E  AC					     lodsb
+     16	010F  26: 88 07					     mov es:[bx], al
+     17	0112  83 C3 02					     add bx, 2
+     18	0115  E2 F7					     loop loop_start
+     19
+     20	0117  B8 4C00					     mov ax, 4c00h
+     21	011A  CD 21					     int 21h
+     22
+     23	011C  48 65 6C 6C 6F 20	77+  Hello		     db	'Hello world!$'
+     24	      6F 72 6C 64 21 24
+     25				     end Start
+Turbo Assembler	 Version 4.1	    02/10/26 15:15:14	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/10/26"
+??FILENAME			  Text	 "exp4	  "
+??TIME				  Text	 "15:15:14"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 EXP4
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+HELLO				  Byte	 DGROUP:011C
+LOOP_START			  Near	 DGROUP:010E
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0129 Word	  Public  CODE
+

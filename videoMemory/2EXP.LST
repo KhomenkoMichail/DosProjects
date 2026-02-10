@@ -1,0 +1,53 @@
+Turbo Assembler	 Version 4.1	    02/10/26 13:08:10	    Page 1
+2exp.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4	0100  B8 B800		     Start:		     mov ax, 0b800h
+      5	0103  8E C0					     mov es, ax
+      6
+      7	0105  BF 0820					     mov di, (80d*2*13)
+      8	0108  B9 0050					     mov cx, 80d
+      9
+     10	010B  B8 6FF3					     mov ax, 110111111110011b
+     11	010E  F3> AB					     rep stosw
+     12
+     13
+     14	0110  B8 4C00					     mov ax, 4c00h
+     15	0113  CD 21					     int 21h
+     16				     end Start
+Turbo Assembler	 Version 4.1	    02/10/26 13:08:10	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/10/26"
+??FILENAME			  Text	 "2exp	  "
+??TIME				  Text	 "13:08:10"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 2EXP
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0115 Word	  Public  CODE
+

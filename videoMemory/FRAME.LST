@@ -1,0 +1,67 @@
+Turbo Assembler	 Version 4.1	    02/10/26 16:43:42	    Page 1
+frame.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5	0100  B8 B800		     Start:		     mov ax, 0b800h
+      6	0103  8E C0					     mov es, ax
+      7	0105  33 C0					     xor ax, ax
+      8
+      9	0107  BE 0080					     mov si, 80h
+     10	010A  AC					     lodsb
+     11
+     12	010B  8A C8					     mov cl, al
+     13
+     14	010D  D1 E8					     shr ax, 1
+     15	010F  BB 0028					     mov bx, 40d
+     16	0112  2B D8					     sub bx, ax
+     17	0114  D1 E3					     shl bx, 1
+     18	0116  81 C3 0820				     add bx, (13d*80d*2)
+     19
+     20	011A			     loop_start:
+     21	011A  AC					     lodsb
+     22	011B  26: 88 07					     mov es:[bx], al
+     23	011E  83 C3 02					     add bx, 2
+     24	0121  E2 F7					     loop loop_start
+     25
+     26
+     27	0123  B8 4C00					     mov ax, 4c00h
+     28	0126  CD 21					     int 21h
+     29				     end Start
+Turbo Assembler	 Version 4.1	    02/10/26 16:43:42	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/10/26"
+??FILENAME			  Text	 "frame	  "
+??TIME				  Text	 "16:43:42"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 FRAME
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+LOOP_START			  Near	 DGROUP:011A
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0128 Word	  Public  CODE
+
