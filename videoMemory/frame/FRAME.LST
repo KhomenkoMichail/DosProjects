@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/10/26 16:43:42	    Page 1
+Turbo Assembler	 Version 4.1	    02/12/26 00:06:05	    Page 1
 frame.asm
 
 
@@ -7,32 +7,230 @@ frame.asm
       2	0000			     .code
       3				     org 100h
       4
-      5	0100  B8 B800		     Start:		     mov ax, 0b800h
-      6	0103  8E C0					     mov es, ax
-      7	0105  33 C0					     xor ax, ax
+      5	0100  B8 B800		     Start:		 mov ax, 0b800h
+      6	0103  8E C0					 mov es, ax
+      7	0105  33 C0					 xor ax, ax
       8
-      9	0107  BE 0080					     mov si, 80h
-     10	010A  AC					     lodsb
+      9	0107  BE 0080					 mov si, 80h
+     10	010A  AC					 lodsb
      11
-     12	010B  8A C8					     mov cl, al
-     13
-     14	010D  D1 E8					     shr ax, 1
-     15	010F  BB 0028					     mov bx, 40d
-     16	0112  2B D8					     sub bx, ax
-     17	0114  D1 E3					     shl bx, 1
-     18	0116  81 C3 0820				     add bx, (13d*80d*2)
-     19
-     20	011A			     loop_start:
-     21	011A  AC					     lodsb
-     22	011B  26: 88 07					     mov es:[bx], al
-     23	011E  83 C3 02					     add bx, 2
-     24	0121  E2 F7					     loop loop_start
-     25
-     26
-     27	0123  B8 4C00					     mov ax, 4c00h
-     28	0126  CD 21					     int 21h
-     29				     end Start
-Turbo Assembler	 Version 4.1	    02/10/26 16:43:42	    Page 2
+     12	010B  8A C8					 mov cl, al
+     13	010D  32 ED					 xor ch, ch
+     14
+     15	010F  32 D2					 xor dl, dl
+     16	0111  32 F6					 xor dh, dh
+     17	0113  32 DB					 xor bl, bl
+     18
+     19	0115  FE CA					 dec dl
+     20	0117  FE C2		     getNumOfStrings:	 inc dl
+     21	0119  AC					 lodsb
+     22	011A  3C 23					 cmp al, '#'
+     23	011C  75 0C					 jne notNewString
+     24	011E  FE CA					 dec dl
+     25	0120  FE C6					 inc dh
+     26	0122  3A DA					 cmp bl, dl
+     27	0124  77 02					 ja  shortString
+     28	0126  8A DA					 mov bl, dl
+     29	0128  32 D2		     shortString:	 xor dl, dl
+     30	012A  E2 EB		     notNewString:	 loop getNumOfStrings
+     31
+     32	012C  FE C6					 inc dh
+     33
+     34	012E  3A D3					 cmp dl, bl
+     35	0130  77 02					 ja alreadyMaxLen
+     36	0132  8A D3					 mov dl, bl
+     37	0134			     alreadyMaxLen:
+     38	0134  8A CE					 mov cl, dh
+     39	0136  32 ED					 xor ch, ch
+     40	0138  BE 0081					 mov si, 81h
+     41
+     42	013B  BB 0019					 mov bx, 25
+     43	013E  8A C6					 mov al, dh
+     44	0140  98					 cbw
+     45	0141  2B D8					 sub bx, ax
+     46	0143  D1 EB					 shr bx, 1
+     47	0145  B8 00A0					 mov ax, 160
+     48	0148  52					 push dx
+     49	0149  F7 E3					 mul bx
+     50	014B  5A					 pop dx
+     51	014C  8B D8					 mov bx, ax
+     52
+     53	014E  33 FF					 xor di, di
+     54	0150  4F					 dec di
+     55
+     56	0151  AC		     printfCurString:	 lodsb
+     57	0152  3C 23					 cmp al, '#'
+Turbo Assembler	 Version 4.1	    02/12/26 00:06:05	    Page 2
+frame.asm
+
+
+
+     58	0154  74 07					 je  isEndOfString
+     59	0156  3C 0D					 cmp al, 0Dh
+     60	0158  74 03					 je  isEndOfString
+     61	015A  47					 inc di
+     62	015B  EB F4					 jmp printfCurString
+     63
+     64	015D  2B F7		     isEndOfString:	 sub si, di
+     65	015F  4E					 dec si
+     66
+     67	0160  B8 0050					 mov ax, 80
+     68	0163  2B C7					 sub ax, di
+     69	0165  D1 E8					 shr ax, 1
+     70	0167  D1 E0					 shl ax, 1
+     71	0169  03 D8					 add bx, ax
+     72
+     73	016B  D1 E7					 shl di, 1
+     74	016D  03 F8					 add di, ax
+     75
+     76	016F  AC		     printfString:	 lodsb
+     77	0170  3C 23					 cmp al, '#'
+     78	0172  74 0C					 je  conditionCheck
+     79	0174  3C 0D					 cmp al, 0Dh
+     80	0176  74 08					 je  conditionCheck
+     81	0178  26: 88 07					 mov es:[bx], al
+     82	017B  83 C3 02					 add bx, 2
+     83	017E  EB EF					 jmp printfString
+     84
+     85	0180  81 C3 00A0	     conditionCheck:	 add bx, 80*2
+     86	0184  2B DF					 sub bx, di
+     87
+     88	0186  33 FF					 xor di, di
+     89	0188  E2 C7					 loop printfCurString
+     90
+     91
+     92
+     93						 ; printing frame:
+     94
+     95	018A  BF 0019				     mov di, 25
+     96	018D  8A C6				     mov al, dh
+     97	018F  98				     cbw
+     98	0190  2B F8				     sub di, ax
+     99	0192  D1 EF				     shr di, 1
+    100	0194  83 EF 03				     sub di, 3d
+    101	0197  B8 00A0				     mov ax, 160
+    102	019A  52				     push dx
+    103	019B  F7 E7				     mul di
+    104	019D  5A				     pop dx
+    105	019E  8B F8				     mov di, ax
+    106
+    107	01A0  33 C0				     xor ax, ax
+    108	01A2  8A C2				     mov al, dl
+    109	01A4  98				     cbw
+    110
+    111	01A5  BB 0050				     mov bx, 80
+    112	01A8  2B D8				     sub bx, ax
+    113	01AA  83 EB 06				     sub bx, 6d
+    114	01AD  D1 EB				     shr bx, 1
+Turbo Assembler	 Version 4.1	    02/12/26 00:06:05	    Page 3
+frame.asm
+
+
+
+    115	01AF  D1 E3				     shl bx, 1
+    116	01B1  03 FB				     add di, bx
+    117
+    118	01B3  33 DB				     xor bx, bx
+    119	01B5  8A DE				     mov bl, dh
+    120	01B7  80 C3 06				     add bl, 6
+    121
+    122	01BA  33 C9		     printfFrameStr:	     xor cx, cx
+    123	01BC  8A CA					     mov cl, dl
+    124	01BE  80 C1 06					     add cl, 6
+    125
+    126
+    127
+    128	01C1  26: C6 45	01 70	     printfFrameByte:	     mov byte ptr es:[di+1], 01110000b
+    129	01C6  83 C7 02					     add di, 2
+    130	01C9  E2 F6					     loop printfFrameByte
+    131
+    132	01CB  81 C7 00A0				     add di, 160d
+    133
+    134	01CF  33 C0					     xor ax, ax
+    135	01D1  8A C2					     mov al, dl
+    136	01D3  98					     cbw
+    137	01D4  D1 E0					     shl ax, 1
+    138	01D6  2B F8					     sub di, ax
+    139	01D8  83 EF 0C					     sub di, 12
+    140
+    141
+    142
+    143	01DB  FE CB					     dec bl
+    144	01DD  80 FB 00					     cmp bl, 0
+    145	01E0  75 D8					     jne printfFrameStr
+    146
+    147
+    148	01E2  81 EF 0140			     sub di, 160*2
+    149	01E6  8A C2				     mov al, dl
+    150	01E8  98				     cbw
+    151	01E9  83 C7 02				     add di, 2
+    152	01EC  26: C6 05	C8			     mov byte ptr es:[di], 0C8h
+    153
+    154	01F0  83 C7 02				     add di, 2
+    155
+    156	01F3  33 C9				     xor cx, cx
+    157	01F5  8A CA				     mov cl, dl
+    158	01F7  80 C1 02				     add cl, 2
+    159
+    160	01FA  26: C6 05	CD	     printHorizon1:  mov byte ptr es:[di], 0CDh
+    161	01FE  83 C7 02				     add di, 2
+    162	0201  E2 F7				     loop printHorizon1
+    163
+    164	0203  26: C6 05	BC			     mov byte ptr es:[di], 0BCh
+    165
+    166	0207  8A C6				     mov al, dh
+    167	0209  04 03				     add al, 3
+    168	020B  98				     cbw
+    169	020C  BB 00A0				     mov bx, 160d
+    170	020F  52				     push dx
+    171	0210  F7 E3				     mul bx
+Turbo Assembler	 Version 4.1	    02/12/26 00:06:05	    Page 4
+frame.asm
+
+
+
+    172	0212  5A				     pop dx
+    173	0213  2B F8				     sub di, ax
+    174	0215  26: C6 05	BB			     mov byte ptr es:[di], 0BBh
+    175	0219  83 EF 02				     sub di, 2
+    176
+    177	021C  33 C9				     xor cx, cx
+    178	021E  8A CA				     mov cl, dl
+    179	0220  80 C1 02				     add cl, 2
+    180
+    181	0223  26: C6 05	CD	     printHorizon2:  mov byte ptr es:[di], 0CDh
+    182	0227  83 EF 02				     sub di, 2
+    183	022A  E2 F7				     loop printHorizon2
+    184
+    185	022C  26: C6 05	C9			     mov byte ptr es:[di], 0C9h
+    186	0230  81 C7 00A0			     add di, 80d*2
+    187
+    188	0234  8A CE				     mov cl, dh
+    189	0236  80 C1 02				     add cl, 2
+    190
+    191	0239  26: C6 05	BA	     printfVert1:    mov byte ptr es:[di], 0BAh
+    192	023D  81 C7 00A0			     add di, 80d*2
+    193	0241  E2 F6				     loop printfVert1
+    194
+    195	0243  8A CE				     mov cl, dh
+    196	0245  80 C1 02				     add cl, 2
+    197
+    198	0248  81 EF 00A0			     sub di, 80d*2
+    199
+    200	024C  8A C2				     mov al, dl
+    201	024E  04 03				     add al, 3
+    202	0250  98				     cbw
+    203	0251  D1 E0				     shl ax, 1
+    204	0253  03 F8				     add di, ax
+    205
+    206	0255  26: C6 05	BA	     printfVert2:    mov byte ptr es:[di], 0BAh
+    207	0259  81 EF 00A0			     sub di, 80d*2
+    208	025D  E2 F6				     loop printfVert2
+    209
+    210	025F  B8 4C00				     mov ax, 4c00h
+    211	0262  CD 21				     int 21h
+    212				     end Start
+Turbo Assembler	 Version 4.1	    02/12/26 00:06:05	    Page 5
 Symbol Table
 
 
@@ -40,9 +238,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/10/26"
+??DATE				  Text	 "02/12/26"
 ??FILENAME			  Text	 "frame	  "
-??TIME				  Text	 "16:43:42"
+??TIME				  Text	 "00:06:05"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP
@@ -56,12 +254,25 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-LOOP_START			  Near	 DGROUP:011A
+ALREADYMAXLEN			  Near	 DGROUP:0134
+CONDITIONCHECK			  Near	 DGROUP:0180
+GETNUMOFSTRINGS			  Near	 DGROUP:0117
+ISENDOFSTRING			  Near	 DGROUP:015D
+NOTNEWSTRING			  Near	 DGROUP:012A
+PRINTFCURSTRING			  Near	 DGROUP:0151
+PRINTFFRAMEBYTE			  Near	 DGROUP:01C1
+PRINTFFRAMESTR			  Near	 DGROUP:01BA
+PRINTFSTRING			  Near	 DGROUP:016F
+PRINTFVERT1			  Near	 DGROUP:0239
+PRINTFVERT2			  Near	 DGROUP:0255
+PRINTHORIZON1			  Near	 DGROUP:01FA
+PRINTHORIZON2			  Near	 DGROUP:0223
+SHORTSTRING			  Near	 DGROUP:0128
 START				  Near	 DGROUP:0100
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  0128 Word	  Public  CODE
+  _TEXT				  16  0264 Word	  Public  CODE
 
