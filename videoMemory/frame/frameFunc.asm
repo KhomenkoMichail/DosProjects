@@ -10,16 +10,10 @@ main:           call initRegs
                 cld
 
                 call printfMessage
-
-                mov al, 01110000b
-
-                call printFrameBackground
-                call printfFrameForeground
+                call printfFrame
 
                 mov ax, 4c00h
                 int 21h
-
-
 
 
 
@@ -279,7 +273,7 @@ printfFrameBackgroundString         endp
 ;Destroyed: di, cl
 ;----------------------------------------------------------------------------------------------
 
-printFrameBackground            proc
+printfFrameBackground            proc
                                 push ax
                                 call getFrameVideoMemoryOffset
                                 pop ax
@@ -310,7 +304,7 @@ printfFrameStr:                 xor cx, cx
                                 jne printfFrameStr
 
                                 ret
-printFrameBackground            endp
+printfFrameBackground            endp
 ;----------------------------------------------------------------------------------------------
 ;Prints frame centered frame background depending
 ;on the number of lines and their length in the message
@@ -542,8 +536,8 @@ printfMessage           proc
                         sub al, 30h
                         cmp al, 0
                         jne @@simpleMode
-                        add si, 10d
-                        sub cl, 10d
+                        add si, 13d             ;;
+                        sub cl, 13d             ;;changes
 
 @@simpleMode:           push si
                         call getMessageParams
@@ -606,6 +600,56 @@ printInternalFrame              endp
 ;Destroyed: ax, cx, si, di
 ;----------------------------------------------------------------------------------------------
 
+getFrameColor           proc
+                        mov al, 01110000b
+                        mov si, 82h
+                        mov bl, [si]
+                        cmp bl, 30h
+                        jne @@end
 
+                        mov si, 8Eh
+                        lodsb
+                        sub al, 30h
+                        cmp al, 10d
+                        jb @@less10_1
+                        sub al, 7d
+@@less10_1:             shl al, 4
+
+                        mov bl, [si]
+                        sub bl, 30h
+                        cmp bl, 10d
+                        jb @@less10_2
+                        sub bl, 7d
+@@less10_2:             add al, bl
+
+@@end:                  ret
+getFrameColor           endp
+;----------------------------------------------------------------------------------------------
+;Gets the color attribute of the frame depending on the selected mode
+;Entry:
+;Exit:  al = color attribute of the frame
+;Expected:  [82h] = frame mode
+;           [8Eh] and [8Fh] = hex color code
+;Destroyed: al, bl, si
+;----------------------------------------------------------------------------------------------
+
+printfFrame             proc
+                        call getFrameColor
+
+                        call printfFrameBackground
+
+                        call printfFrameForeground
+                        ret
+
+printfFrame             endp
+;----------------------------------------------------------------------------------------------
+;Prints a centered frame.
+;Entry: dh = the number of lines in the message
+;       dl = max length of the string in the message
+;Exit:
+;Expected: direction flag = 0, es contains the address of the video memory segment,
+;          [82h] = frame mode.
+;Destroyed: ax, bx, cx, si, di
+;----------------------------------------------------------------------------------------------
 
 end Start
