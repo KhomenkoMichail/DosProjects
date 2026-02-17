@@ -9,8 +9,11 @@ Start:
 main:           call initRegs
                 cld
 
-                call printfMessage
-                call printfFrame
+                call processCommandLineMessage
+
+                call printfAnimatedFrame
+
+                call printfCommandLineMessage
 
                 mov ax, 4c00h
                 int 21h
@@ -190,8 +193,19 @@ myPuts              endp
 ;Destroyed: si, bx, al, cx
 ;----------------------------------------------------------------------------------------------
 
-putCommandLineMessage           proc
-                                call getVideoMemoryVerticalOffset
+printfCommandLineMessage           proc
+                                mov cl, dh
+                                xor ch, ch
+
+                                mov si, 82h
+                                lodsb
+                                mov si, 84h
+
+                                cmp al, 30h
+                                jne @@simpleMode
+                                add si, 13d
+
+@@simpleMode:                   call getVideoMemoryVerticalOffset
 
 @@nextStr:                      push bx
                                 push si
@@ -207,14 +221,12 @@ putCommandLineMessage           proc
                                 loop @@nextStr
 
                                 ret
-putCommandLineMessage            endp
+printfCommandLineMessage           endp
 ;----------------------------------------------------------------------------------------------
 ;Prints a centered command line message
-;Entry: si = start address of the message
-;       cx = number of message lines
-;       bx = video memory vertical position offset
-;Exit
-;Expected: direction flag = 0, bx must be a multiple of 80d*2
+;Entry: dh = number of message lines
+;Exit:
+;Expected: direction flag = 0
 ;Destroyed: ax, bx, cx, si, di
 ;----------------------------------------------------------------------------------------------
 
@@ -273,7 +285,7 @@ printfFrameBackgroundString         endp
 ;Destroyed: di, cl
 ;----------------------------------------------------------------------------------------------
 
-printfFrameBackground            proc
+printfFrameBackground           proc
                                 push ax
                                 call getFrameVideoMemoryOffset
                                 pop ax
@@ -304,7 +316,7 @@ printfFrameStr:                 xor cx, cx
                                 jne printfFrameStr
 
                                 ret
-printfFrameBackground            endp
+printfFrameBackground           endp
 ;----------------------------------------------------------------------------------------------
 ;Prints frame centered frame background depending
 ;on the number of lines and their length in the message
@@ -370,8 +382,6 @@ printfFrameForeground           proc
                                 mov ah, al
 
                                 sub di, 160*2
-                                ;mov al, dl
-                                ;cbw
                                 add di, 2
 
                                 mov al, 0C8h
@@ -483,12 +493,15 @@ printfFrameForeground           proc
                                 call printVerticalString
                                 pop ax
 
-                                cmp ah, 30h
-                                jne @@end
                                 add di, 2*80d
-                                call printInternalFrame
+                                mov al, 0h
+                                cmp ah, 30h
+                                jne @@printfInternal
+                                mov si, 88h
+                                lodsb
+@@printfInternal:               call printInternalFrame
 
-@@end:                          ret
+                                ret
 printfFrameForeground           endp
 ;----------------------------------------------------------------------------------------------
 ;Prints centered frame foreground depending
@@ -520,48 +533,40 @@ initRegs                endp
 ;Destroyed: ax, bx, cx, dx, es
 ;----------------------------------------------------------------------------------------------
 
-printfMessage           proc
+processCommandLineMessage           proc
+                                    mov si, 80h
+                                    lodsb
 
-                        mov si, 80h
-                        lodsb
+                                    mov cl, al
 
-                        mov cl, al
+                                    mov si, 82h
+                                    lodsb
 
-                        mov si, 82h
-                        lodsb
+                                    inc si
+                                    sub cl, 3
 
-                        inc si
-                        sub cl, 3
+                                    sub al, 30h
+                                    cmp al, 0
+                                    jne @@simpleMode
+                                    add si, 13d
+                                    sub cl, 13d
 
-                        sub al, 30h
-                        cmp al, 0
-                        jne @@simpleMode
-                        add si, 13d             ;;
-                        sub cl, 13d             ;;changes
+@@simpleMode:                       push si
+                                    call getMessageParams
+                                    pop si
 
-@@simpleMode:           push si
-                        call getMessageParams
-                        pop si
+                                    ret
 
-                        mov cl, dh
-                        xor ch, ch
-
-                        call putCommandLineMessage
-                        ret
-
-printfMessage           endp
+processCommandLineMessage           endp
 ;----------------------------------------------------------------------------------------------
-;Сalculates position and prints a centered command line message
+;Сalculates position and gets params of a centered command line message
 ;Entry:
 ;Exit:
-;Expected: direction flag = 0, es contains the address of the video memory segment.
+;Expected: direction flag = 0.
 ;Destroyed: ax, bx, cx, si
 ;----------------------------------------------------------------------------------------------
 
 printInternalFrame              proc
-
-                                mov si, 88h
-                                lodsb
 
                                 sub di, 2
                                 mov cl, dl
@@ -592,7 +597,8 @@ printInternalFrame              endp
 ;----------------------------------------------------------------------------------------------
 ;Prints centered internal frame foreground depending
 ;on the number of lines and their length in the message
-;Entry: dh = the number of lines in the message
+;Entry: al = internal frame symbol ascii-code
+;       dh = the number of lines in the message
 ;       dl = max length of the string in the message
 ;       di = video memory offset of the upper right corner of the frame
 ;Exit:
@@ -644,6 +650,52 @@ printfFrame             proc
 printfFrame             endp
 ;----------------------------------------------------------------------------------------------
 ;Prints a centered frame.
+;Entry: dh = the number of lines in the message
+;       dl = max length of the string in the message
+;Exit:
+;Expected: direction flag = 0, es contains the address of the video memory segment,
+;          [82h] = frame mode.
+;Destroyed: ax, bx, cx, si, di
+;----------------------------------------------------------------------------------------------
+
+wait0_5seс              proc
+                        mov  cx, 7d
+                        mov  dx, 41248d
+                        mov  ax, 8600h
+                        int  15h
+
+                        ret
+wait0_5seс              endp
+;----------------------------------------------------------------------------------------------
+;Pauses for half a second.
+;Entry:
+;Exit:
+;Expected:
+;Destroyed: ax, cx, dx
+;----------------------------------------------------------------------------------------------
+
+printfAnimatedFrame     proc
+                        xor cx, cx
+                        mov cl, dl
+                        mov dl, 1
+
+@@animation:            push cx
+                        call printfFrame
+                        push dx
+                        call wait0_5seс
+                        pop dx
+                        pop cx
+                        add dl, 2
+                        cmp dl, cl
+                        jbe @@animation
+
+                        dec dl
+
+                        ret
+
+printfAnimatedFrame     endp
+;----------------------------------------------------------------------------------------------
+;Creates an animation of drawing a centered frame.
 ;Entry: dh = the number of lines in the message
 ;       dl = max length of the string in the message
 ;Exit:
