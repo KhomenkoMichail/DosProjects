@@ -44,7 +44,6 @@ hashSymbolStrlen        endp
 ;Destroyed: al, si, dl
 ;----------------------------------------------------------------------------------------------
 
-
 getMessageParams      proc
 
                       ;mov cl, al
@@ -368,7 +367,7 @@ printVerticalString     endp
 ;----------------------------------------------------------------------------------------------
 ;Prints vertical string
 ;Entry: al = symbol binary code
-;       ah = direction flag (a = 0, di += 2; a != 0, di -= 2)
+;       ah = direction flag (ah = 0, di += 80d*2; ah != 0, di -= 80d*2)
 ;       di = video memory offset
 ;       cx = length of string
 ;Exit:

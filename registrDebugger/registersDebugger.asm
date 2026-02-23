@@ -134,7 +134,7 @@ printfRegs08Int             proc
 
                             push 0b800h
                             pop es
-                            mov bx, (80d*5+33d)*2
+                            mov bx, (80d*6+33d)*2
 
                             mov byte ptr es:[bx], 'a'
                             mov byte ptr es:[bx+2], 'x'
@@ -217,6 +217,13 @@ printfRegs08Int             proc
                             sub bx, 80d*2*12d
                             add bx, 11d*2
                             call printfFlags
+
+                            mov dh, 13d
+                            mov dl, 14d
+                            mov al, 30h
+
+                            call printfFrameBackground
+                            call printfFrameForeground
 
                             mov al, 20h
                             out 20h, al
@@ -419,6 +426,273 @@ printVerticalString     endp
 ;Exit:
 ;Expected: es contains the address of the video memory segment.
 ;Destroyed: cx, bx, di
+;----------------------------------------------------------------------------------------------
+
+
+printfFrameBackground           proc
+                                push ax
+                                call getFrameVideoMemoryOffset
+                                pop ax
+
+                                xor bx, bx
+                                mov bl, dh
+                                add bl, 6
+
+printfFrameStr:                 xor cx, cx
+                                mov cl, dl
+                                add cl, 6
+
+                                call printfFrameBackgroundString
+
+                                add di, 160d
+
+                                push ax
+                                xor ax, ax
+                                mov al, dl
+                                cbw
+                                shl ax, 1
+                                sub di, ax
+                                sub di, 12
+                                pop ax
+
+                                dec bl
+                                cmp bl, 0
+                                jne printfFrameStr
+
+                                ret
+printfFrameBackground           endp
+;----------------------------------------------------------------------------------------------
+;Prints frame centered frame background depending
+;on the number of lines and their length in the message
+;Entry: dh = the number of lines in the message
+;       dl = max length of the string in the message
+;       al = frame color binary code
+;Exit:
+;Expected:
+;Destroyed: bx, di, cl
+;----------------------------------------------------------------------------------------------
+
+
+getFrameVideoMemoryOffset       proc
+
+                                mov di, 25
+                                mov al, dh
+                                cbw
+                                sub di, ax
+                                shr di, 1
+                                sub di, 3d
+                                mov ax, 160
+                                push dx
+                                mul di
+                                pop dx
+                                mov di, ax
+
+                                xor ax, ax
+                                mov al, dl
+                                cbw
+
+                                mov bx, 80
+                                sub bx, ax
+                                sub bx, 6d
+                                shr bx, 1
+                                shl bx, 1
+                                add di, bx
+
+                                ret
+getFrameVideoMemoryOffset       endp
+;----------------------------------------------------------------------------------------------
+;Gets a video memory offset for frame background depending
+;on the number of lines and their length in the message
+;Entry: dh = the number of lines in the message
+;       dl = max length of the string in the message
+;Exit:  di = video memory offset for frame background
+;Expected:
+;Destroyed: ax, bx, di
+;----------------------------------------------------------------------------------------------
+
+
+printfFrameBackgroundString         proc
+
+@@printfByte:                       mov byte ptr es:[di+1], al
+                                    add di, 2
+                                    loop @@printfByte
+
+                                    ret
+printfFrameBackgroundString         endp
+;----------------------------------------------------------------------------------------------
+;Prints frameBackground string a certain of color
+;Entry: di = starting address of the string
+;       al = frame color binary code
+;       cl = length of the string
+;Exit:
+;Expected: es contains the address of the video memory segment.
+;Destroyed: di, cl
+;----------------------------------------------------------------------------------------------
+
+printfFrameForeground           proc
+
+                                sub di, 160*2
+                                add di, 2
+
+                                mov al, 0C8h
+                                mov byte ptr es:[di], al
+
+                                add di, 2
+
+                                xor cx, cx
+                                mov cl, dl
+                                add cl, 2
+
+                                mov al, 0CDh
+                                push ax
+                                mov ah, 0
+                                call printHorizontalString
+                                pop ax
+
+                                mov al, 0BCh
+                                mov byte ptr es:[di], al
+
+                                mov al, dh
+                                add al, 3
+                                push ax
+                                cbw
+                                mov bx, 160d
+                                push dx
+                                mul bx
+                                pop dx
+                                sub di, ax
+                                pop ax
+
+                                mov al, 0BBh
+                                mov byte ptr es:[di], al
+
+                                sub di, 2
+
+                                xor cx, cx
+                                mov cl, dl
+                                add cl, 2
+                                mov al, 0CDh
+                                push ax
+                                mov ah, 1
+                                call printHorizontalString
+                                pop ax
+
+                                mov al, 0C9h
+                                mov byte ptr es:[di], al
+                                add di, 80d*2
+
+                                mov cl, dh
+                                add cl, 2
+                                mov al, 0BAh
+                                push ax
+                                mov ah, 0
+                                call printVerticalString
+                                pop ax
+
+                                sub di, 80d*2
+
+                                push ax
+                                mov al, dl
+                                add al, 3
+                                cbw
+                                shl ax, 1
+                                add di, ax
+                                pop ax
+
+                                mov cl, dh
+                                add cl, 2
+                                mov al, 0BAh
+                                push ax
+                                mov ah, 1
+                                call printVerticalString
+                                pop ax
+
+                                add di, 2*80d
+                                mov al, 0h
+                                call printfInternalFrame
+
+                                add dh, 4h
+                                add dl, 4h
+                                sub di, (80d*2)
+                                add di, 6h
+                                call printfInternalFrame
+
+                                ret
+printfFrameForeground           endp
+;----------------------------------------------------------------------------------------------
+;Prints centered frame foreground depending
+;on the number of lines and their length in the message
+;Entry: dh = the number of lines in the message
+;       dl = max length of the string in the message
+;       di = video memory offset of the lower right corner of the frame
+;Exit:
+;Expected: es contains the address of the video memory segment.
+;Destroyed: ax, bx, cx, si, di
+;----------------------------------------------------------------------------------------------
+
+
+printHorizontalString   proc
+                        mov bx, 2
+                        cmp ah, 0
+                        je @@nextElem
+                        neg bx
+
+@@nextElem:             mov byte ptr es:[di], al
+                        add di, bx
+                        loop @@nextElem
+
+                        ret
+
+printHorizontalString   endp
+;----------------------------------------------------------------------------------------------
+;Prints horizontal string
+;Entry: al = symbol binary code
+;       ah = direction flag (a = 0, di += 2; a != 0, di -= 2)
+;       di = video memory offset
+;       cx = length of string
+;Exit:
+;Expected: es contains the address of the video memory segment.
+;Destroyed: cx, bx
+;----------------------------------------------------------------------------------------------
+
+printfInternalFrame             proc
+
+                                sub di, 2
+                                mov cl, dl
+                                add cl, 2
+                                mov ah, 1
+                                call printHorizontalString
+
+                                add di, 2
+                                mov cl, dh
+                                add cl, 2
+                                mov ah, 0
+                                call printVerticalString
+
+                                sub di, 2*80d
+                                mov cl, dl
+                                add cl, 2
+                                mov ah, 0
+                                call printHorizontalString
+
+                                sub di, 2
+                                mov cl, dh
+                                add cl, 2
+                                mov ah, 1
+                                call printVerticalString
+
+                                ret
+printfInternalFrame             endp
+;----------------------------------------------------------------------------------------------
+;Prints centered internal frame foreground depending
+;on the number of lines and their length in the message
+;Entry: al = internal frame symbol ascii-code
+;       dh = the number of lines in the message
+;       dl = max length of the string in the message
+;       di = video memory offset of the upper right corner of the frame
+;Exit:
+;Expected: es contains the address of the video memory segment.
+;Destroyed: ax, cx, si, di
 ;----------------------------------------------------------------------------------------------
 
 printfRegsFlag          db  0
