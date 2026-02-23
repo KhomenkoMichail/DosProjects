@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 1
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 1
 regist~1.asm
 
 
@@ -9,408 +9,480 @@ regist~1.asm
       4				     org 100h
       5				     locals @@
       6
-      7	0100  B8 3509		     Start:	     mov ax, 3509h
-      8	0103  CD 21				     int 21h
-      9
-     10	0105  89 1E 014Dr			     mov old09ofs, bx
-     11	0109  8C C3				     mov bx, es
-     12	010B  89 1E 014Fr			     mov old09seg, bx
-     13
-     14	010F  6A 00				     push 0
-     15	0111  07				     pop es
+      7	0100			     Start:
+      8	0100  E8 003D				     call replace09Int
+      9	0103  E8 005D				     call replace08Int
+     10
+     11	0106  9C				     pushf
+     12	0107  0E				     push cs
+     13	0108  E8 000F				     call registersDebugger09Int
+     14
+     15	010B  E8 0000				     call endResidentProgram
      16
-     17	0112  BB 0024				     mov bx, 4*09h
-     18	0115  FA				     cli
-     19	0116  26: C7 07	0133r			     mov es:[bx], offset registersDebugger09Int
-     20	011B  8C C8				     mov ax, cs
-     21	011D  26: 89 47	02			     mov es:[bx+2], ax
-     22	0121  FB				     sti
-     23
-     24	0122  9C				     pushf
-     25	0123  0E				     push cs
-     26	0124  E8 000C				     call registersDebugger09Int
-     27
-     28	0127  B8 3100				     mov ax, 3100h
-     29	012A  BA 03DFr				     mov dx, offset endOfProgram
-     30	012D  C1 EA 04				     shr dx, 4				     ; //FIXME
-     31	0130  42				     inc dx				     ;
-     32	0131  CD 21				     int 21h
-     33
-     34
-     35
-     36	0133			     registersDebugger09Int	 proc
-     37	0133  50 53 06						 push ax bx es
-     38
-     39	0136  E4 60						 in al,	60h
-     40								 ;cmp al, 'W'			;; //FIXME
-     41								 ;jne @@normalMode
-     42								 ;cmp int08WasReplaced,	0h
-     43								 ;jne @@normalMode
-     44
-     45	0138  E8 0016						 call replace08Int
-     46
-     47	013B  E4 61		     @@normalMode:		 in al,	61h
-     48	013D  0C 80						 or al,	80h
-     49	013F  E6 61						 out 61h, al
-     50	0141  24 7F						 and al, not 80h
-     51	0143  E6 61						 out 61h, al
-     52
-     53	0145  B0 20						 mov al, 20h
-     54	0147  E6 20						 out 20h, al
-     55
-     56	0149  07 5B 58						 pop es	bx ax
-     57
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 2
+     17
+     18	010E			     endResidentProgram		 proc
+     19
+     20	010E  B8 3100						 mov ax, 3100h
+     21	0111  BA 03F6r						 mov dx, offset	endOfProgram
+     22	0114  C1 EA 04						 shr dx, 4
+     23	0117  42						 inc dx
+     24	0118  CD 21						 int 21h
+     25
+     26	011A			     endResidentProgram		 endp
+     27				     ;-----------------------------------------------------------------------------------------------
+     28				     -
+     29				     ;Ends resident program.
+     30				     ;Entry:
+     31				     ;Exit:
+     32				     ;Expected:	The label "endOfProgram" is located at the end of the code.
+     33				     ;Destroyed: ax, dx
+     34				     ;-----------------------------------------------------------------------------------------------
+     35				     -
+     36
+     37	011A			     registersDebugger09Int	 proc
+     38	011A  50 53 06						 push ax bx es
+     39
+     40	011D  E4 60						 in al,	60h
+     41	011F  3C 57						 cmp al, 'W'
+     42	0121  75 07						 jne @@normalMode
+     43	0123  2E: C6 06	03F5r 01  +				 mov cs:printfRegsFlag,	1h
+     44	      90
+     45
+     46	012A  E4 61		     @@normalMode:		 in al,	61h
+     47	012C  0C 80						 or al,	80h
+     48	012E  E6 61						 out 61h, al
+     49	0130  24 7F						 and al, not 80h
+     50	0132  E6 61						 out 61h, al
+     51
+     52	0134  B0 20						 mov al, 20h
+     53	0136  E6 20						 out 20h, al
+     54
+     55	0138  07 5B 58						 pop es	bx ax
+     56
+     57	013B  EA						 db 0eah
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 2
 regist~1.asm
 
 
 
-     58	014C  EA						 db 0eah
-     59	014D  0000		     old09ofs			 dw 0
-     60	014F  0000		     old09seg			 dw 0
-     61
-     62	0151			     registersDebugger09Int	 endp
-     63
-     64	0151			     replace08Int		 proc
-     65
-     66	0151  B8 3508						 mov ax, 3508h
-     67	0154  CD 21						 int 21h
-     68
-     69	0156  89 1E 029Br					 mov old08ofs, bx
-     70	015A  8C C3						 mov bx, es
-     71	015C  89 1E 029Dr					 mov old08seg, bx
+     58	013C  0000		     old09ofs			 dw 0
+     59	013E  0000		     old09seg			 dw 0
+     60
+     61	0140			     registersDebugger09Int	 endp
+     62				     ;-----------------------------------------------------------------------------------------------
+     63				     -
+     64				     ;New 09 interrupt,	which raises the printfRegsFlag	to 1, when a key F11 is	pressed.
+     65				     ;Entry:
+     66				     ;Exit:
+     67				     ;Expected:Old 09 interrupt	was replaced to	this function,
+     68				     ;old09ofs contains	it's old segment and old09ofs contains it's old	offset.
+     69				     ;Destroyed:
+     70				     ;-----------------------------------------------------------------------------------------------
+     71				     -
      72
-     73	0160  6A 00						 push 0
-     74	0162  07						 pop es
-     75
-     76	0163  BB 0020						 mov bx, 4*08h
-     77	0166  FA						 cli
-     78	0167  26: C7 07	017Ar					 mov es:[bx], offset printfRegs08Int
-     79	016C  8C C8						 mov ax, cs
-     80	016E  26: 89 47	02					 mov es:[bx+2],	ax
-     81	0172  FB						 sti
-     82
-     83	0173  C6 06 03DEr 01 90					 mov int08WasReplaced, 1h
+     73
+     74	0140			     replace09Int		 proc
+     75	0140  B8 3509						 mov ax, 3509h
+     76	0143  CD 21						 int 21h
+     77
+     78	0145  89 1E 013Cr					 mov old09ofs, bx
+     79	0149  8C C3						 mov bx, es
+     80	014B  89 1E 013Er					 mov old09seg, bx
+     81
+     82	014F  6A 00						 push 0
+     83	0151  07						 pop es
      84
-     85	0179  C3						 ret
-     86	017A			     replace08Int		 endp
-     87
-     88
-     89	017A			     printfRegs08Int		 proc
-     90	017A  50 53 51 52 56 57	55+				 push ax bx cx dx si di	bp ds es ss
-     91	      1E 06 16
-     92	0184  8B EC						 mov bp, sp
-     93									     ; Теперь стек (относительно bp):
-     94									     ; [bp]    = ss
-     95									     ; [bp+2]  = es
-     96									     ; [bp+4]  = ds
-     97									     ; [bp+6]  = bp (старое)
-     98									     ; [bp+8]  = di
-     99									     ; [bp+10] = si
-    100									     ; [bp+12] = dx
-    101									     ; [bp+14] = cx
-    102									     ; [bp+16] = bx
-    103									     ; [bp+18] = ax
-    104									     ; [bp+20] = ip (автоматически)
-    105									     ; [bp+22] = cs
-    106									     ; [bp+24] = flags
-    107
-    108	0186  68 B800						 push 0b800h
-    109	0189  07						 pop es
-    110	018A  BB 0362						 mov bx, (80d*5+33d)*2
-    111
-    112	018D  26: C6 07	61					 mov byte ptr es:[bx], 'a'
-    113	0191  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
-    114	0196  E8 0106						 call printfHexRegValue
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 3
+     85	0152  BB 0024						 mov bx, 4*09h
+     86	0155  FA						 cli
+     87	0156  26: C7 07	011Ar					 mov es:[bx], offset registersDebugger09Int
+     88	015B  8C C8						 mov ax, cs
+     89	015D  26: 89 47	02					 mov es:[bx+2],	ax
+     90	0161  FB						 sti
+     91
+     92	0162  C3						 ret
+     93	0163			     replace09Int		 endp
+     94				     ;-----------------------------------------------------------------------------------------------
+     95				     -
+     96				     ;Replaces interrupt 9 with	a function registersDebugger09Int.
+     97				     ;Entry:
+     98				     ;Exit:
+     99				     ;Expected:
+    100				     ;Destroyed: ax, bx, es
+    101				     ;-----------------------------------------------------------------------------------------------
+    102				     -
+    103
+    104	0163			     replace08Int		 proc
+    105
+    106	0163  B8 3508						 mov ax, 3508h
+    107	0166  CD 21						 int 21h
+    108
+    109	0168  89 1E 02B2r					 mov old08ofs, bx
+    110	016C  8C C3						 mov bx, es
+    111	016E  89 1E 02B4r					 mov old08seg, bx
+    112
+    113	0172  6A 00						 push 0
+    114	0174  07						 pop es
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 3
 regist~1.asm
 
 
 
     115
-    116	0199  81 C3 00A0					 add bx, 80d*2
-    117	019D  26: C6 07	62					 mov byte ptr es:[bx], 'b'
-    118	01A1  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
-    119	01A6  8B 46 10						 mov ax, [bp+16]
-    120	01A9  E8 00F3						 call printfHexRegValue
-    121
-    122	01AC  81 C3 00A0					 add bx, 80d*2
-    123	01B0  26: C6 07	63					 mov byte ptr es:[bx], 'c'
-    124	01B4  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
-    125	01B9  8B 46 0E						 mov ax, [bp+14]
-    126	01BC  E8 00E0						 call printfHexRegValue
-    127
-    128	01BF  81 C3 00A0					 add bx, 80d*2
-    129	01C3  26: C6 07	64					 mov byte ptr es:[bx], 'd'
-    130	01C7  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
-    131	01CC  8B 46 0C						 mov ax, [bp+12]
-    132	01CF  E8 00CD						 call printfHexRegValue
-    133
-    134	01D2  81 C3 00A0					 add bx, 80d*2
-    135	01D6  26: C6 07	73					 mov byte ptr es:[bx], 's'
-    136	01DA  26: C6 47	02 69					 mov byte ptr es:[bx+2], 'i'
-    137	01DF  8B 46 0A						 mov ax, [bp+10]
-    138	01E2  E8 00BA						 call printfHexRegValue
-    139
-    140	01E5  81 C3 00A0					 add bx, 80d*2
-    141	01E9  26: C6 07	64					 mov byte ptr es:[bx], 'd'
-    142	01ED  26: C6 47	02 69					 mov byte ptr es:[bx+2], 'i'
-    143	01F2  8B 46 08						 mov ax, [bp+8]
-    144	01F5  E8 00A7						 call printfHexRegValue
-    145
-    146	01F8  81 C3 00A0					 add bx, 80d*2
-    147	01FC  26: C6 07	62					 mov byte ptr es:[bx], 'b'
-    148	0200  26: C6 47	02 70					 mov byte ptr es:[bx+2], 'p'
-    149	0205  8B 46 06						 mov ax, [bp+6]
-    150	0208  E8 0094						 call printfHexRegValue
-    151
-    152	020B  81 C3 00A0					 add bx, 80d*2
-    153	020F  26: C6 07	73					 mov byte ptr es:[bx], 's'
-    154	0213  26: C6 47	02 70					 mov byte ptr es:[bx+2], 'p'
-    155	0218  8B C4						 mov ax, sp
-    156	021A  2D 001A						 sub ax, 13d*2
-    157	021D  E8 007F						 call printfHexRegValue
+    116	0175  BB 0020						 mov bx, 4*08h
+    117	0178  FA						 cli
+    118	0179  26: C7 07	0186r					 mov es:[bx], offset printfRegs08Int
+    119	017E  8C C8						 mov ax, cs
+    120	0180  26: 89 47	02					 mov es:[bx+2],	ax
+    121	0184  FB						 sti
+    122
+    123	0185  C3						 ret
+    124	0186			     replace08Int		 endp
+    125				     ;-----------------------------------------------------------------------------------------------
+    126				     -
+    127				     ;Replaces interrupt 8 with	a function printfRegs08Int.
+    128				     ;Entry:
+    129				     ;Exit:
+    130				     ;Expected:
+    131				     ;Destroyed: ax, bx, es
+    132				     ;-----------------------------------------------------------------------------------------------
+    133				     -
+    134
+    135
+    136	0186			     printfRegs08Int		 proc
+    137	0186  2E: 80 3E	03F5r 00				 cmp cs:printfRegsFlag,	0h
+    138	018C  75 03						 jne @@continue
+    139	018E  E9 0120						 jmp @@end
+    140
+    141	0191  50 53 51 52 56 57	55+  @@continue:		 push ax bx cx dx si di	bp ds es ss
+    142	      1E 06 16
+    143	019B  8B EC						 mov bp, sp
+    144
+    145	019D  68 B800						 push 0b800h
+    146	01A0  07						 pop es
+    147	01A1  BB 0362						 mov bx, (80d*5+33d)*2
+    148
+    149	01A4  26: C6 07	61					 mov byte ptr es:[bx], 'a'
+    150	01A8  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
+    151	01AD  E8 0106						 call printfHexRegValue
+    152
+    153	01B0  81 C3 00A0					 add bx, 80d*2
+    154	01B4  26: C6 07	62					 mov byte ptr es:[bx], 'b'
+    155	01B8  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
+    156	01BD  8B 46 10						 mov ax, [bp+16]
+    157	01C0  E8 00F3						 call printfHexRegValue
     158
-    159	0220  81 C3 00A0					 add bx, 80d*2
-    160	0224  26: C6 07	64					 mov byte ptr es:[bx], 'd'
-    161	0228  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
-    162	022D  8B 46 04						 mov ax, [bp+4]
-    163	0230  E8 006C						 call printfHexRegValue
+    159	01C3  81 C3 00A0					 add bx, 80d*2
+    160	01C7  26: C6 07	63					 mov byte ptr es:[bx], 'c'
+    161	01CB  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
+    162	01D0  8B 46 0E						 mov ax, [bp+14]
+    163	01D3  E8 00E0						 call printfHexRegValue
     164
-    165	0233  81 C3 00A0					 add bx, 80d*2
-    166	0237  26: C6 07	65					 mov byte ptr es:[bx], 'e'
-    167	023B  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
-    168	0240  8B 46 02						 mov ax, [bp+2]
-    169	0243  E8 0059						 call printfHexRegValue
+    165	01D6  81 C3 00A0					 add bx, 80d*2
+    166	01DA  26: C6 07	64					 mov byte ptr es:[bx], 'd'
+    167	01DE  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
+    168	01E3  8B 46 0C						 mov ax, [bp+12]
+    169	01E6  E8 00CD						 call printfHexRegValue
     170
-    171	0246  81 C3 00A0					 add bx, 80d*2
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 4
+    171	01E9  81 C3 00A0					 add bx, 80d*2
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 4
 regist~1.asm
 
 
 
-    172	024A  26: C6 07	73					 mov byte ptr es:[bx], 's'
-    173	024E  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
-    174	0253  8B 46 00						 mov ax, [bp]
-    175	0256  E8 0046						 call printfHexRegValue
+    172	01ED  26: C6 07	73					 mov byte ptr es:[bx], 's'
+    173	01F1  26: C6 47	02 69					 mov byte ptr es:[bx+2], 'i'
+    174	01F6  8B 46 0A						 mov ax, [bp+10]
+    175	01F9  E8 00BA						 call printfHexRegValue
     176
-    177	0259  81 C3 00A0					 add bx, 80d*2
-    178	025D  26: C6 07	63					 mov byte ptr es:[bx], 'c'
-    179	0261  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
-    180	0266  8B 46 16						 mov ax, [bp+22]
-    181	0269  E8 0033						 call printfHexRegValue
+    177	01FC  81 C3 00A0					 add bx, 80d*2
+    178	0200  26: C6 07	64					 mov byte ptr es:[bx], 'd'
+    179	0204  26: C6 47	02 69					 mov byte ptr es:[bx+2], 'i'
+    180	0209  8B 46 08						 mov ax, [bp+8]
+    181	020C  E8 00A7						 call printfHexRegValue
     182
-    183	026C  81 C3 00A0					 add bx, 80d*2
-    184	0270  26: C6 07	69					 mov byte ptr es:[bx], 'i'
-    185	0274  26: C6 47	02 70					 mov byte ptr es:[bx+2], 'p'
-    186	0279  8B 46 14						 mov ax, [bp+20]
-    187	027C  E8 0020						 call printfHexRegValue
+    183	020F  81 C3 00A0					 add bx, 80d*2
+    184	0213  26: C6 07	62					 mov byte ptr es:[bx], 'b'
+    185	0217  26: C6 47	02 70					 mov byte ptr es:[bx+2], 'p'
+    186	021C  8B 46 06						 mov ax, [bp+6]
+    187	021F  E8 0094						 call printfHexRegValue
     188
-    189	027F  8B 46 18						 mov ax, [bp+24]
-    190	0282  81 EB 0780					 sub bx, 80d*2*12d
-    191	0286  83 C3 16						 add bx, 11d*2
-    192	0289  E8 0066						 call printfFlags
-    193
-    194	028C  B0 20						 mov al, 20h
-    195	028E  E6 20						 out 20h, al
-    196
-    197	0290  17 07 1F 5D 5F 5E	5A+				 pop ss	es ds bp di si dx cx bx	ax	;;//FIXME
-    198	      59 5B 58
-    199
-    200	029A  EA						 db 0eah
-    201	029B  0000		     old08ofs			 dw 0
-    202	029D  0000		     old08seg			 dw 0
-    203
-    204	029F			     printfRegs08Int		 endp
-    205
-    206
+    189	0222  81 C3 00A0					 add bx, 80d*2
+    190	0226  26: C6 07	73					 mov byte ptr es:[bx], 's'
+    191	022A  26: C6 47	02 70					 mov byte ptr es:[bx+2], 'p'
+    192	022F  8B C4						 mov ax, sp
+    193	0231  2D 001A						 sub ax, 13d*2
+    194	0234  E8 007F						 call printfHexRegValue
+    195
+    196	0237  81 C3 00A0					 add bx, 80d*2
+    197	023B  26: C6 07	64					 mov byte ptr es:[bx], 'd'
+    198	023F  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
+    199	0244  8B 46 04						 mov ax, [bp+4]
+    200	0247  E8 006C						 call printfHexRegValue
+    201
+    202	024A  81 C3 00A0					 add bx, 80d*2
+    203	024E  26: C6 07	65					 mov byte ptr es:[bx], 'e'
+    204	0252  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
+    205	0257  8B 46 02						 mov ax, [bp+2]
+    206	025A  E8 0059						 call printfHexRegValue
     207
-    208	029F			     printfHexRegValue		 proc
-    209
-    210	029F  33 D2						 xor dx, dx
-    211	02A1  8A D4						 mov dl, ah
-    212	02A3  C0 EA 04						 shr dl, 4h
+    208	025D  81 C3 00A0					 add bx, 80d*2
+    209	0261  26: C6 07	73					 mov byte ptr es:[bx], 's'
+    210	0265  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
+    211	026A  8B 46 00						 mov ax, [bp]
+    212	026D  E8 0046						 call printfHexRegValue
     213
-    214	02A6  80 C2 30						 add dl, 30h
-    215	02A9  80 FA 39						 cmp dl, 39h
-    216	02AC  76 03						 jbe @@notLetter1
-    217	02AE  80 C2 07						 add dl, 7h
-    218
-    219	02B1  26: 88 57	06	     @@notLetter1:		 mov byte ptr es:[bx+6], dl
-    220
-    221	02B5  8A D4						 mov dl, ah
-    222	02B7  80 E2 0F						 and dl, 00001111b
-    223	02BA  80 C2 30						 add dl, 30h
-    224	02BD  80 FA 39						 cmp dl, 39h
-    225	02C0  76 03						 jbe @@notLetter2
-    226	02C2  80 C2 07						 add dl, 7h
-    227
-    228	02C5  26: 88 57	08	     @@notLetter2:		 mov byte ptr es:[bx+8], dl
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 5
+    214	0270  81 C3 00A0					 add bx, 80d*2
+    215	0274  26: C6 07	63					 mov byte ptr es:[bx], 'c'
+    216	0278  26: C6 47	02 73					 mov byte ptr es:[bx+2], 's'
+    217	027D  8B 46 16						 mov ax, [bp+22]
+    218	0280  E8 0033						 call printfHexRegValue
+    219
+    220	0283  81 C3 00A0					 add bx, 80d*2
+    221	0287  26: C6 07	69					 mov byte ptr es:[bx], 'i'
+    222	028B  26: C6 47	02 70					 mov byte ptr es:[bx+2], 'p'
+    223	0290  8B 46 14						 mov ax, [bp+20]
+    224	0293  E8 0020						 call printfHexRegValue
+    225
+    226	0296  8B 46 18						 mov ax, [bp+24]
+    227	0299  81 EB 0780					 sub bx, 80d*2*12d
+    228	029D  83 C3 16						 add bx, 11d*2
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 5
 regist~1.asm
 
 
 
-    229
-    230	02C9  8A D0						 mov dl, al
-    231	02CB  C0 EA 04						 shr dl, 4h
-    232
-    233	02CE  80 C2 30						 add dl, 30h
-    234	02D1  80 FA 39						 cmp dl, 39h
-    235	02D4  76 03						 jbe @@notLetter3
-    236	02D6  80 C2 07						 add dl, 7h
-    237
-    238	02D9  26: 88 57	0A	     @@notLetter3:		 mov byte ptr es:[bx+10d], dl
-    239
-    240	02DD  8A D0						 mov dl, al
-    241	02DF  80 E2 0F						 and dl, 00001111b
-    242	02E2  80 C2 30						 add dl, 30h
-    243	02E5  80 FA 39						 cmp dl, 39h
-    244	02E8  76 03						 jbe @@notLetter4
-    245	02EA  80 C2 07						 add dl, 7h
-    246
-    247	02ED  26: 88 57	0C	     @@notLetter4:		 mov byte ptr es:[bx+12d], dl
-    248
-    249	02F1  C3						 ret
-    250	02F2			     printfHexRegValue		 endp
+    229	02A0  E8 0066						 call printfFlags
+    230
+    231	02A3  B0 20						 mov al, 20h
+    232	02A5  E6 20						 out 20h, al
+    233
+    234	02A7  17 07 1F 5D 5F 5E	5A+				 pop ss	es ds bp di si dx cx bx	ax
+    235	      59 5B 58
+    236
+    237	02B1  EA		     @@end:			 db 0eah
+    238	02B2  0000		     old08ofs			 dw 0
+    239	02B4  0000		     old08seg			 dw 0
+    240
+    241	02B6			     printfRegs08Int		 endp
+    242				     ;-----------------------------------------------------------------------------------------------
+    243				     -
+    244				     ;New 08 interrupt,	which prints the updated values	​​of the processor registers
+    245				     ;and flags	in a frame at each tick	of the system timer.
+    246				     ;Entry:
+    247				     ;Exit:
+    248				     ;Expected:Old 08 interrupt	was replaced to	this function,
+    249				     ;old08ofs contains	it's old segment and old08ofs contains it's old	offset.
+    250				     ;Destroyed:
     251				     ;-----------------------------------------------------------------------------------------------
     252				     -
-    253				     ;Writes the hexadecimal value of the register to the video	memory
-    254				     ;Entry: ax	= current register value
-    255				     ;	     bx	= video	memory offset of the beginning of the inscription reduced by 6 bytes
-    256				     ;	     (the first	6 bytes	are used to write the register name)
-    257				     ;Exit:
-    258				     ;Expected:	es contains video memory segment
-    259				     ;Destroyed: dx
-    260				     ;-----------------------------------------------------------------------------------------------
-    261				     -
-    262
-    263	02F2			     printfFlags	     proc
-    264
-    265	02F2  26: C6 07	63				     mov byte ptr es:[bx], 'c'
-    266	02F6  26: C6 87	00A0 7A				     mov byte ptr es:[bx + 80d*2], 'z'
-    267	02FC  26: C6 87	0140 73				     mov byte ptr es:[bx + 80d*2*2], 's'
-    268	0302  26: C6 87	01E0 6F				     mov byte ptr es:[bx + 80d*2*3], 'o'
-    269	0308  26: C6 87	0280 70				     mov byte ptr es:[bx + 80d*2*4], 'p'
-    270	030E  26: C6 87	0320 61				     mov byte ptr es:[bx + 80d*2*5], 'a'
-    271	0314  26: C6 87	03C0 69				     mov byte ptr es:[bx + 80d*2*6], 'i'
-    272	031A  26: C6 87	0460 64				     mov byte ptr es:[bx + 80d*2*7], 'd'
-    273
-    274	0320  50 53					     push ax bx
-    275	0322  8B FB					     mov di, bx
-    276	0324  83 C7 02					     add di, 2
-    277	0327  B0 3D					     mov al, '='
-    278	0329  32 E4					     xor ah, ah
-    279	032B  B9 0008					     mov cx, 8h
-    280	032E  E8 009B					     call printVerticalString
-    281
-    282	0331  5B 58					     pop bx ax
-    283	0333  50 53					     push ax bx
-    284	0335  8B FB					     mov di, bx
-    285	0337  83 C7 04					     add di, 4h
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 6
+    253
+    254
+    255	02B6			     printfHexRegValue		 proc
+    256
+    257	02B6  33 D2						 xor dx, dx
+    258	02B8  8A D4						 mov dl, ah
+    259	02BA  C0 EA 04						 shr dl, 4h
+    260
+    261	02BD  80 C2 30						 add dl, 30h
+    262	02C0  80 FA 39						 cmp dl, 39h
+    263	02C3  76 03						 jbe @@notLetter1
+    264	02C5  80 C2 07						 add dl, 7h
+    265
+    266	02C8  26: 88 57	06	     @@notLetter1:		 mov byte ptr es:[bx+6], dl
+    267
+    268	02CC  8A D4						 mov dl, ah
+    269	02CE  80 E2 0F						 and dl, 00001111b
+    270	02D1  80 C2 30						 add dl, 30h
+    271	02D4  80 FA 39						 cmp dl, 39h
+    272	02D7  76 03						 jbe @@notLetter2
+    273	02D9  80 C2 07						 add dl, 7h
+    274
+    275	02DC  26: 88 57	08	     @@notLetter2:		 mov byte ptr es:[bx+8], dl
+    276
+    277	02E0  8A D0						 mov dl, al
+    278	02E2  C0 EA 04						 shr dl, 4h
+    279
+    280	02E5  80 C2 30						 add dl, 30h
+    281	02E8  80 FA 39						 cmp dl, 39h
+    282	02EB  76 03						 jbe @@notLetter3
+    283	02ED  80 C2 07						 add dl, 7h
+    284
+    285	02F0  26: 88 57	0A	     @@notLetter3:		 mov byte ptr es:[bx+10d], dl
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 6
 regist~1.asm
 
 
 
-    286	033A  B0 30					     mov al, '0'
-    287	033C  32 E4					     xor ah, ah
-    288	033E  B9 0008					     mov cx, 8h
-    289	0341  E8 0088					     call printVerticalString
-    290	0344  5B 58					     pop bx ax
-    291
-    292	0346  83 C3 04					     add bx, 4h
+    286
+    287	02F4  8A D0						 mov dl, al
+    288	02F6  80 E2 0F						 and dl, 00001111b
+    289	02F9  80 C2 30						 add dl, 30h
+    290	02FC  80 FA 39						 cmp dl, 39h
+    291	02FF  76 03						 jbe @@notLetter4
+    292	0301  80 C2 07						 add dl, 7h
     293
-    294	0349  8B D0					     mov dx, ax
-    295	034B  83 E2 01					     and dx, 0000000000000001b
-    296	034E  83 FA 00					     cmp dx, 0
-    297	0351  74 04					     je	@@zeroCF
-    298	0353  26: C6 07	31				     mov byte ptr es:[bx], '1'
-    299	0357			     @@zeroCF:
-    300
-    301	0357  8B D0					     mov dx, ax
-    302	0359  83 E2 40					     and dx, 0000000001000000b
-    303	035C  83 FA 00					     cmp dx, 0
-    304	035F  74 06					     je	@@zeroZF
-    305	0361  26: C6 87	00A0 31				     mov byte ptr es:[bx + 80d*2], '1'
-    306	0367			     @@zeroZF:
-    307	0367  8B D0					     mov dx, ax
-    308	0369  81 E2 0080				     and dx, 0000000010000000b
-    309	036D  83 FA 00					     cmp dx, 0
-    310	0370  74 06					     je	@@zeroSF
-    311	0372  26: C6 87	0140 31				     mov byte ptr es:[bx + 80d*2*2], '1'
-    312	0378			     @@zeroSF:
-    313	0378  8B D0					     mov dx, ax
-    314	037A  81 E2 0800				     and dx, 0000100000000000b
-    315	037E  83 FA 00					     cmp dx, 0
-    316	0381  74 06					     je	@@zeroOF
-    317	0383  26: C6 87	01E0 31				     mov byte ptr es:[bx + 80d*2*3], '1'
-    318	0389			     @@zeroOF:
-    319	0389  8B D0					     mov dx, ax
-    320	038B  83 E2 04					     and dx, 0000000000000100b
-    321	038E  83 FA 00					     cmp dx, 0
-    322	0391  74 06					     je	@@zeroPF
-    323	0393  26: C6 87	0280 31				     mov byte ptr es:[bx + 80d*2*4], '1'
-    324	0399			     @@zeroPF:
-    325	0399  8B D0					     mov dx, ax
-    326	039B  83 E2 10					     and dx, 0000000000010000b
-    327	039E  83 FA 00					     cmp dx, 0
-    328	03A1  74 06					     je	@@zeroAF
-    329	03A3  26: C6 87	0320 31				     mov byte ptr es:[bx + 80d*2*5], '1'
-    330	03A9			     @@zeroAF:
-    331	03A9  8B D0					     mov dx, ax
-    332	03AB  81 E2 0200				     and dx, 0000001000000000b
-    333	03AF  83 FA 00					     cmp dx, 0
-    334	03B2  74 06					     je	@@zeroIF
-    335	03B4  26: C6 87	03C0 31				     mov byte ptr es:[bx + 80d*2*6], '1'
-    336	03BA			     @@zeroIF:
-    337	03BA  8B D0					     mov dx, ax
-    338	03BC  81 E2 0400				     and dx, 0000010000000000b
-    339	03C0  83 FA 00					     cmp dx, 0
-    340	03C3  74 06					     je	@@zeroDF
-    341	03C5  26: C6 87	0460 31				     mov byte ptr es:[bx + 80d*2*7], '1'
-    342
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 7
+    294	0304  26: 88 57	0C	     @@notLetter4:		 mov byte ptr es:[bx+12d], dl
+    295
+    296	0308  C3						 ret
+    297	0309			     printfHexRegValue		 endp
+    298				     ;-----------------------------------------------------------------------------------------------
+    299				     -
+    300				     ;Writes the hexadecimal value of the register to the video	memory
+    301				     ;Entry: ax	= current register value
+    302				     ;	     bx	= video	memory offset of the beginning of the inscription reduced by 6 bytes
+    303				     ;	     (the first	6 bytes	are used to write the register name)
+    304				     ;Exit:
+    305				     ;Expected:	es contains video memory segment
+    306				     ;Destroyed: dx
+    307				     ;-----------------------------------------------------------------------------------------------
+    308				     -
+    309
+    310	0309			     printfFlags	     proc
+    311
+    312	0309  8B FB					     mov di, bx
+    313	030B  50 53					     push ax bx
+    314	030D  E8 0088					     call printfFlagsColumn
+    315	0310  5B 58					     pop bx ax
+    316
+    317	0312  83 C3 04					     add bx, 4h
+    318
+    319	0315  8B D0					     mov dx, ax
+    320	0317  83 E2 01					     and dx, 0000000000000001b
+    321	031A  83 FA 00					     cmp dx, 0
+    322	031D  74 04					     je	@@zeroCF
+    323	031F  26: C6 07	31				     mov byte ptr es:[bx], '1'
+    324	0323			     @@zeroCF:
+    325
+    326	0323  8B D0					     mov dx, ax
+    327	0325  83 E2 40					     and dx, 0000000001000000b
+    328	0328  83 FA 00					     cmp dx, 0
+    329	032B  74 06					     je	@@zeroZF
+    330	032D  26: C6 87	00A0 31				     mov byte ptr es:[bx + 80d*2], '1'
+    331	0333			     @@zeroZF:
+    332	0333  8B D0					     mov dx, ax
+    333	0335  81 E2 0080				     and dx, 0000000010000000b
+    334	0339  83 FA 00					     cmp dx, 0
+    335	033C  74 06					     je	@@zeroSF
+    336	033E  26: C6 87	0140 31				     mov byte ptr es:[bx + 80d*2*2], '1'
+    337	0344			     @@zeroSF:
+    338	0344  8B D0					     mov dx, ax
+    339	0346  81 E2 0800				     and dx, 0000100000000000b
+    340	034A  83 FA 00					     cmp dx, 0
+    341	034D  74 06					     je	@@zeroOF
+    342	034F  26: C6 87	01E0 31				     mov byte ptr es:[bx + 80d*2*3], '1'
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 7
 regist~1.asm
 
 
 
-    343	03CB			     @@zeroDF:
-    344	03CB  C3					     ret
-    345	03CC			     printfFlags	     endp
-    346
-    347
-    348	03CC			     printVerticalString     proc
-    349	03CC  BB 00A0					     mov bx, 80d*2
-    350	03CF  80 FC 00					     cmp ah, 0
-    351	03D2  74 02					     je	@@nextElem
-    352	03D4  F7 DB					     neg bx
-    353
-    354	03D6  26: 88 05		     @@nextElem:	     mov byte ptr es:[di], al
-    355	03D9  03 FB					     add di, bx
-    356	03DB  E2 F9					     loop @@nextElem
-    357
-    358	03DD  C3					     ret
-    359
-    360	03DE			     printVerticalString     endp
-    361				     ;----------------------------------------------------------------------------------------------
-    362				     ;Prints vertical string
-    363				     ;Entry: al	= symbol binary	code
-    364				     ;	     ah	= direction flag (ah = 0, di +=	80d*2; ah != 0,	di -= 80d*2)
-    365				     ;	     di	= video	memory offset
-    366				     ;	     cx	= length of string
-    367				     ;Exit:
-    368				     ;Expected:	es contains the	address	of the video memory segment.
-    369				     ;Destroyed: cx, bx, di
-    370				     ;----------------------------------------------------------------------------------------------
-    371
-    372
-    373	03DE  00		     int08WasReplaced  db  0
-    374
-    375
-    376	03DF			     endOfProgram:
-    377				     end		     Start
-Turbo Assembler	 Version 4.1	    02/23/26 15:55:33	    Page 8
+    343	0355			     @@zeroOF:
+    344	0355  8B D0					     mov dx, ax
+    345	0357  83 E2 04					     and dx, 0000000000000100b
+    346	035A  83 FA 00					     cmp dx, 0
+    347	035D  74 06					     je	@@zeroPF
+    348	035F  26: C6 87	0280 31				     mov byte ptr es:[bx + 80d*2*4], '1'
+    349	0365			     @@zeroPF:
+    350	0365  8B D0					     mov dx, ax
+    351	0367  83 E2 10					     and dx, 0000000000010000b
+    352	036A  83 FA 00					     cmp dx, 0
+    353	036D  74 06					     je	@@zeroAF
+    354	036F  26: C6 87	0320 31				     mov byte ptr es:[bx + 80d*2*5], '1'
+    355	0375			     @@zeroAF:
+    356	0375  8B D0					     mov dx, ax
+    357	0377  81 E2 0200				     and dx, 0000001000000000b
+    358	037B  83 FA 00					     cmp dx, 0
+    359	037E  74 06					     je	@@zeroIF
+    360	0380  26: C6 87	03C0 31				     mov byte ptr es:[bx + 80d*2*6], '1'
+    361	0386			     @@zeroIF:
+    362	0386  8B D0					     mov dx, ax
+    363	0388  81 E2 0400				     and dx, 0000010000000000b
+    364	038C  83 FA 00					     cmp dx, 0
+    365	038F  74 06					     je	@@zeroDF
+    366	0391  26: C6 87	0460 31				     mov byte ptr es:[bx + 80d*2*7], '1'
+    367
+    368	0397			     @@zeroDF:
+    369	0397  C3					     ret
+    370	0398			     printfFlags	     endp
+    371				     ;-----------------------------------------------------------------------------------------------
+    372				     -
+    373				     ;Writes the value of the flags to the video memory
+    374				     ;Entry: ax	= register of flags
+    375				     ;	     bx	= video	memory offset of the CF
+    376				     ;Exit:
+    377				     ;Expected:	es contains video memory segment.
+    378				     ;Destroyed: bx, cx, dx
+    379				     ;-----------------------------------------------------------------------------------------------
+    380				     -
+    381
+    382	0398			     printfFlagsColumn	     proc
+    383
+    384	0398  26: C6 05	63				     mov byte ptr es:[di], 'c'
+    385	039C  26: C6 85	00A0 7A				     mov byte ptr es:[di + 80d*2], 'z'
+    386	03A2  26: C6 85	0140 73				     mov byte ptr es:[di + 80d*2*2], 's'
+    387	03A8  26: C6 85	01E0 6F				     mov byte ptr es:[di + 80d*2*3], 'o'
+    388	03AE  26: C6 85	0280 70				     mov byte ptr es:[di + 80d*2*4], 'p'
+    389	03B4  26: C6 85	0320 61				     mov byte ptr es:[di + 80d*2*5], 'a'
+    390	03BA  26: C6 85	03C0 69				     mov byte ptr es:[di + 80d*2*6], 'i'
+    391	03C0  26: C6 85	0460 64				     mov byte ptr es:[di + 80d*2*7], 'd'
+    392
+    393	03C6  83 C7 02					     add di, 2
+    394	03C9  B0 3D					     mov al, '='
+    395	03CB  32 E4					     xor ah, ah
+    396	03CD  B9 0008					     mov cx, 8h
+    397	03D0  57					     push di
+    398	03D1  E8 000F					     call printVerticalString
+    399	03D4  5F					     pop di
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 8
+regist~1.asm
+
+
+
+    400
+    401	03D5  83 C7 02					     add di, 2
+    402	03D8  B0 30					     mov al, '0'
+    403	03DA  32 E4					     xor ah, ah
+    404	03DC  B9 0008					     mov cx, 8h
+    405	03DF  E8 0001					     call printVerticalString
+    406
+    407	03E2  C3					     ret
+    408	03E3			     printfFlagsColumn	     endp
+    409				     ;----------------------------------------------------------------------------------------------
+    410				     ;Prints a column with processor flags with	zeroed values.
+    411				     ;Entry: di	= video	memory offset.
+    412				     ;Exit:
+    413				     ;Expected:	es contains the	address	of the video memory segment.
+    414				     ;Destroyed: ax, bx, cx, di
+    415				     ;----------------------------------------------------------------------------------------------
+    416
+    417	03E3			     printVerticalString     proc
+    418	03E3  BB 00A0					     mov bx, 80d*2
+    419	03E6  80 FC 00					     cmp ah, 0
+    420	03E9  74 02					     je	@@nextElem
+    421	03EB  F7 DB					     neg bx
+    422
+    423	03ED  26: 88 05		     @@nextElem:	     mov byte ptr es:[di], al
+    424	03F0  03 FB					     add di, bx
+    425	03F2  E2 F9					     loop @@nextElem
+    426
+    427	03F4  C3					     ret
+    428
+    429	03F5			     printVerticalString     endp
+    430				     ;----------------------------------------------------------------------------------------------
+    431				     ;Prints vertical string
+    432				     ;Entry: al	= symbol binary	code
+    433				     ;	     ah	= direction flag (ah = 0, di +=	80d*2; ah != 0,	di -= 80d*2)
+    434				     ;	     di	= video	memory offset
+    435				     ;	     cx	= length of string
+    436				     ;Exit:
+    437				     ;Expected:	es contains the	address	of the video memory segment.
+    438				     ;Destroyed: cx, bx, di
+    439				     ;----------------------------------------------------------------------------------------------
+    440
+    441	03F5  00		     printfRegsFlag	     db	 0
+    442
+    443	03F6			     endOfProgram:
+    444				     end		     Start
+Turbo Assembler	 Version 4.1	    02/23/26 22:42:50	    Page 9
 Symbol Table
 
 
@@ -420,23 +492,25 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/23/26"
 ??FILENAME			  Text	 "regist~1"
-??TIME				  Text	 "15:55:33"
+??TIME				  Text	 "22:42:49"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
-@@NEXTELEM			  Near	 DGROUP:03D6
-@@NORMALMODE			  Near	 DGROUP:013B
-@@NOTLETTER1			  Near	 DGROUP:02B1
-@@NOTLETTER2			  Near	 DGROUP:02C5
-@@NOTLETTER3			  Near	 DGROUP:02D9
-@@NOTLETTER4			  Near	 DGROUP:02ED
-@@ZEROAF			  Near	 DGROUP:03A9
-@@ZEROCF			  Near	 DGROUP:0357
-@@ZERODF			  Near	 DGROUP:03CB
-@@ZEROIF			  Near	 DGROUP:03BA
-@@ZEROOF			  Near	 DGROUP:0389
-@@ZEROPF			  Near	 DGROUP:0399
-@@ZEROSF			  Near	 DGROUP:0378
-@@ZEROZF			  Near	 DGROUP:0367
+@@CONTINUE			  Near	 DGROUP:0191
+@@END				  Near	 DGROUP:02B1
+@@NEXTELEM			  Near	 DGROUP:03ED
+@@NORMALMODE			  Near	 DGROUP:012A
+@@NOTLETTER1			  Near	 DGROUP:02C8
+@@NOTLETTER2			  Near	 DGROUP:02DC
+@@NOTLETTER3			  Near	 DGROUP:02F0
+@@NOTLETTER4			  Near	 DGROUP:0304
+@@ZEROAF			  Near	 DGROUP:0375
+@@ZEROCF			  Near	 DGROUP:0323
+@@ZERODF			  Near	 DGROUP:0397
+@@ZEROIF			  Near	 DGROUP:0386
+@@ZEROOF			  Near	 DGROUP:0355
+@@ZEROPF			  Near	 DGROUP:0365
+@@ZEROSF			  Near	 DGROUP:0344
+@@ZEROZF			  Near	 DGROUP:0333
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0707H
@@ -448,23 +522,26 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-ENDOFPROGRAM			  Near	 DGROUP:03DF
-INT08WASREPLACED		  Byte	 DGROUP:03DE
-OLD08OFS			  Word	 DGROUP:029B
-OLD08SEG			  Word	 DGROUP:029D
-OLD09OFS			  Word	 DGROUP:014D
-OLD09SEG			  Word	 DGROUP:014F
-PRINTFFLAGS			  Near	 DGROUP:02F2
-PRINTFHEXREGVALUE		  Near	 DGROUP:029F
-PRINTFREGS08INT			  Near	 DGROUP:017A
-PRINTVERTICALSTRING		  Near	 DGROUP:03CC
-REGISTERSDEBUGGER09INT		  Near	 DGROUP:0133
-REPLACE08INT			  Near	 DGROUP:0151
+ENDOFPROGRAM			  Near	 DGROUP:03F6
+ENDRESIDENTPROGRAM		  Near	 DGROUP:010E
+OLD08OFS			  Word	 DGROUP:02B2
+OLD08SEG			  Word	 DGROUP:02B4
+OLD09OFS			  Word	 DGROUP:013C
+OLD09SEG			  Word	 DGROUP:013E
+PRINTFFLAGS			  Near	 DGROUP:0309
+PRINTFFLAGSCOLUMN		  Near	 DGROUP:0398
+PRINTFHEXREGVALUE		  Near	 DGROUP:02B6
+PRINTFREGS08INT			  Near	 DGROUP:0186
+PRINTFREGSFLAG			  Byte	 DGROUP:03F5
+PRINTVERTICALSTRING		  Near	 DGROUP:03E3
+REGISTERSDEBUGGER09INT		  Near	 DGROUP:011A
+REPLACE08INT			  Near	 DGROUP:0163
+REPLACE09INT			  Near	 DGROUP:0140
 START				  Near	 DGROUP:0100
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  03DF Word	  Public  CODE
+  _TEXT				  16  03F6 Word	  Public  CODE
 

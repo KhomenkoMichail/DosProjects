@@ -4,45 +4,41 @@
 org 100h
 locals @@
 
-Start:          mov ax, 3509h
-                int 21h
-
-                mov old09ofs, bx
-                mov bx, es
-                mov old09seg, bx
-
-                push 0
-                pop es
-
-                mov bx, 4*09h
-                cli
-                mov es:[bx], offset registersDebugger09Int
-                mov ax, cs
-                mov es:[bx+2], ax
-                sti
+Start:
+                call replace09Int
+                call replace08Int
 
                 pushf
                 push cs
                 call registersDebugger09Int
 
-                mov ax, 3100h
-                mov dx, offset endOfProgram
-                shr dx, 4                               ; //FIXME
-                inc dx                                  ;
-                int 21h
+                call endResidentProgram
 
 
+endResidentProgram          proc
+
+                            mov ax, 3100h
+                            mov dx, offset endOfProgram
+                            shr dx, 4
+                            inc dx
+                            int 21h
+
+endResidentProgram          endp
+;------------------------------------------------------------------------------------------------
+;Ends resident program.
+;Entry:
+;Exit:
+;Expected: The label "endOfProgram" is located at the end of the code.
+;Destroyed: ax, dx
+;------------------------------------------------------------------------------------------------
 
 registersDebugger09Int      proc
                             push ax bx es
 
                             in al, 60h
-                            ;cmp al, 'W'                   ;; //FIXME
-                            ;jne @@normalMode
-                            ;cmp int08WasReplaced, 0h
-                            ;jne @@normalMode
-
-                            call replace08Int
+                            cmp al, 'W'
+                            jne @@normalMode
+                            mov cs:printfRegsFlag, 1h
 
 @@normalMode:               in al, 61h
                             or al, 80h
@@ -60,6 +56,43 @@ old09ofs                    dw 0
 old09seg                    dw 0
 
 registersDebugger09Int      endp
+;------------------------------------------------------------------------------------------------
+;New 09 interrupt, which raises the printfRegsFlag to 1, when a key F11 is pressed.
+;Entry:
+;Exit:
+;Expected:Old 09 interrupt was replaced to this function,
+;old09ofs contains it's old segment and old09ofs contains it's old offset.
+;Destroyed:
+;------------------------------------------------------------------------------------------------
+
+
+replace09Int                proc
+                            mov ax, 3509h
+                            int 21h
+
+                            mov old09ofs, bx
+                            mov bx, es
+                            mov old09seg, bx
+
+                            push 0
+                            pop es
+
+                            mov bx, 4*09h
+                            cli
+                            mov es:[bx], offset registersDebugger09Int
+                            mov ax, cs
+                            mov es:[bx+2], ax
+                            sti
+
+                            ret
+replace09Int                endp
+;------------------------------------------------------------------------------------------------
+;Replaces interrupt 9 with a function registersDebugger09Int.
+;Entry:
+;Exit:
+;Expected:
+;Destroyed: ax, bx, es
+;------------------------------------------------------------------------------------------------
 
 replace08Int                proc
 
@@ -80,14 +113,23 @@ replace08Int                proc
                             mov es:[bx+2], ax
                             sti
 
-                            mov int08WasReplaced, 1h
-
                             ret
 replace08Int                endp
+;------------------------------------------------------------------------------------------------
+;Replaces interrupt 8 with a function printfRegs08Int.
+;Entry:
+;Exit:
+;Expected:
+;Destroyed: ax, bx, es
+;------------------------------------------------------------------------------------------------
 
 
 printfRegs08Int             proc
-                            push ax bx cx dx si di bp ds es ss
+                            cmp cs:printfRegsFlag, 0h
+                            jne @@continue
+                            jmp @@end
+
+@@continue:                 push ax bx cx dx si di bp ds es ss
                             mov bp, sp
 
                             push 0b800h
@@ -179,14 +221,22 @@ printfRegs08Int             proc
                             mov al, 20h
                             out 20h, al
 
-                            pop ss es ds bp di si dx cx bx ax      ;;//FIXME
+                            pop ss es ds bp di si dx cx bx ax
 
-                            db 0eah
+@@end:                      db 0eah
 old08ofs                    dw 0
 old08seg                    dw 0
 
 printfRegs08Int             endp
-
+;------------------------------------------------------------------------------------------------
+;New 08 interrupt, which prints the updated values ​​of the processor registers
+;and flags in a frame at each tick of the system timer.
+;Entry:
+;Exit:
+;Expected:Old 08 interrupt was replaced to this function,
+;old08ofs contains it's old segment and old08ofs contains it's old offset.
+;Destroyed:
+;------------------------------------------------------------------------------------------------
 
 
 printfHexRegValue           proc
@@ -244,31 +294,9 @@ printfHexRegValue           endp
 
 printfFlags             proc
 
-                        mov byte ptr es:[bx], 'c'
-                        mov byte ptr es:[bx + 80d*2], 'z'
-                        mov byte ptr es:[bx + 80d*2*2], 's'
-                        mov byte ptr es:[bx + 80d*2*3], 'o'
-                        mov byte ptr es:[bx + 80d*2*4], 'p'
-                        mov byte ptr es:[bx + 80d*2*5], 'a'
-                        mov byte ptr es:[bx + 80d*2*6], 'i'
-                        mov byte ptr es:[bx + 80d*2*7], 'd'
-
-                        push ax bx
                         mov di, bx
-                        add di, 2
-                        mov al, '='
-                        xor ah, ah
-                        mov cx, 8h
-                        call printVerticalString
-
-                        pop bx ax
                         push ax bx
-                        mov di, bx
-                        add di, 4h
-                        mov al, '0'
-                        xor ah, ah
-                        mov cx, 8h
-                        call printVerticalString
+                        call printfFlagsColumn
                         pop bx ax
 
                         add bx, 4h
@@ -325,7 +353,49 @@ printfFlags             proc
 @@zeroDF:
                         ret
 printfFlags             endp
+;------------------------------------------------------------------------------------------------
+;Writes the value of the flags to the video memory
+;Entry: ax = register of flags
+;       bx = video memory offset of the CF
+;Exit:
+;Expected: es contains video memory segment.
+;Destroyed: bx, cx, dx
+;------------------------------------------------------------------------------------------------
 
+printfFlagsColumn       proc
+
+                        mov byte ptr es:[di], 'c'
+                        mov byte ptr es:[di + 80d*2], 'z'
+                        mov byte ptr es:[di + 80d*2*2], 's'
+                        mov byte ptr es:[di + 80d*2*3], 'o'
+                        mov byte ptr es:[di + 80d*2*4], 'p'
+                        mov byte ptr es:[di + 80d*2*5], 'a'
+                        mov byte ptr es:[di + 80d*2*6], 'i'
+                        mov byte ptr es:[di + 80d*2*7], 'd'
+
+                        add di, 2
+                        mov al, '='
+                        xor ah, ah
+                        mov cx, 8h
+                        push di
+                        call printVerticalString
+                        pop di
+
+                        add di, 2
+                        mov al, '0'
+                        xor ah, ah
+                        mov cx, 8h
+                        call printVerticalString
+
+                        ret
+printfFlagsColumn       endp
+;----------------------------------------------------------------------------------------------
+;Prints a column with processor flags with zeroed values.
+;Entry: di = video memory offset.
+;Exit:
+;Expected: es contains the address of the video memory segment.
+;Destroyed: ax, bx, cx, di
+;----------------------------------------------------------------------------------------------
 
 printVerticalString     proc
                         mov bx, 80d*2
@@ -351,9 +421,7 @@ printVerticalString     endp
 ;Destroyed: cx, bx, di
 ;----------------------------------------------------------------------------------------------
 
-
-int08WasReplaced  db  0
-
+printfRegsFlag          db  0
 
 endOfProgram:
 end                     Start
