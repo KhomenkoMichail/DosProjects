@@ -222,8 +222,7 @@ printfRegs08Int             proc
                             mov dl, 14d
                             mov al, 30h
 
-                            call printfFrameBackground
-                            call printfFrameForeground
+                            call printfRegistersFrame
 
                             mov al, 20h
                             out 20h, al
@@ -385,14 +384,14 @@ printfFlagsColumn       proc
                         xor ah, ah
                         mov cx, 8h
                         push di
-                        call printVerticalString
+                        call printfVerticalString
                         pop di
 
                         add di, 2
                         mov al, '0'
                         xor ah, ah
                         mov cx, 8h
-                        call printVerticalString
+                        call printfVerticalString
 
                         ret
 printfFlagsColumn       endp
@@ -404,7 +403,7 @@ printfFlagsColumn       endp
 ;Destroyed: ax, bx, cx, di
 ;----------------------------------------------------------------------------------------------
 
-printVerticalString     proc
+printfVerticalString     proc
                         mov bx, 80d*2
                         cmp ah, 0
                         je @@nextElem
@@ -416,7 +415,7 @@ printVerticalString     proc
 
                         ret
 
-printVerticalString     endp
+printfVerticalString     endp
 ;----------------------------------------------------------------------------------------------
 ;Prints vertical string
 ;Entry: al = symbol binary code
@@ -586,7 +585,7 @@ printfFrameForeground           proc
                                 mov al, 0BAh
                                 push ax
                                 mov ah, 0
-                                call printVerticalString
+                                call printfVerticalString
                                 pop ax
 
                                 sub di, 80d*2
@@ -604,7 +603,7 @@ printfFrameForeground           proc
                                 mov al, 0BAh
                                 push ax
                                 mov ah, 1
-                                call printVerticalString
+                                call printfVerticalString
                                 pop ax
 
                                 add di, 2*80d
@@ -667,7 +666,7 @@ printfInternalFrame             proc
                                 mov cl, dh
                                 add cl, 2
                                 mov ah, 0
-                                call printVerticalString
+                                call printfVerticalString
 
                                 sub di, 2*80d
                                 mov cl, dl
@@ -679,7 +678,7 @@ printfInternalFrame             proc
                                 mov cl, dh
                                 add cl, 2
                                 mov ah, 1
-                                call printVerticalString
+                                call printfVerticalString
 
                                 ret
 printfInternalFrame             endp
@@ -694,6 +693,35 @@ printfInternalFrame             endp
 ;Expected: es contains the address of the video memory segment.
 ;Destroyed: ax, cx, si, di
 ;----------------------------------------------------------------------------------------------
+
+printfRegistersFrame    proc
+
+                        call printfFrameBackground
+
+                        call printfFrameForeground
+
+                        mov di, (80d*4+42d)*2
+                        mov byte ptr es:[di], 0CBh
+                        add di, 80d*2
+                        mov al, 0BAh
+                        xor ah, ah
+                        mov cx, 15d
+                        call printfVerticalString
+                        mov byte ptr es:[di], 0CAh
+
+                        sub di, 162d
+                        mov al, 0
+                        mov ah, 1
+                        mov cx, 15d
+                        call printfVerticalString
+
+                        add di, 164d
+                        xor ah, ah
+                        mov cx, 15d
+                        call printfVerticalString
+
+                        ret
+printfRegistersFrame    endp
 
 printfRegsFlag          db  0
 
