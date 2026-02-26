@@ -33,11 +33,19 @@ endResidentProgram          endp
 ;------------------------------------------------------------------------------------------------
 
 registersDebugger09Int      proc
-                            push ax bx es
+                            push ax bx di es
 
                             in al, 60h
                             cmp al, 'W'
                             jne @@normalMode
+                            mov bx, (80d*3+30d)*2
+
+                            push 0b800h
+                            pop ds
+                            push 0be00h
+                            pop es
+                            call copyFrame
+
                             mov cs:printfRegsFlag, 1h
 
 @@normalMode:               in al, 61h
@@ -49,7 +57,7 @@ registersDebugger09Int      proc
                             mov al, 20h
                             out 20h, al
 
-                            pop es bx ax
+                            pop es di bx ax
 
                             db 0eah
 old09ofs                    dw 0
@@ -131,8 +139,9 @@ printfRegs08Int             proc
 
 @@continue:                 push ax bx cx dx si di bp ds es ss
                             mov bp, sp
+                            cld
 
-                            push 0b800h
+                            push 0bd00h
                             pop es
                             mov bx, (80d*6+33d)*2
 
@@ -223,6 +232,14 @@ printfRegs08Int             proc
                             mov al, 30h
 
                             call printfRegistersFrame
+
+                            mov bx, (80d*3+30d)*2
+                            push 0bd00h
+                            pop ds
+                            push 0b800h
+                            pop es
+
+                            call copyFrame
 
                             mov al, 20h
                             out 20h, al
@@ -755,6 +772,34 @@ printfRegistersFrame    endp
 ;Destroyed: ax, bx, cx, dx, si, di
 ;----------------------------------------------------------------------------------------------
 
+copyFrame               proc
+
+                        mov si, bx
+                        mov di, bx
+                        mov cx, 19d
+
+@@row:
+                        push cx si di
+                        mov cx, 20d
+                        rep movsw
+                        pop di si cx
+                        add si, 160d
+                        add di, 160d
+                        loop @@row
+
+                        ret
+
+copyFrame               endp
+;----------------------------------------------------------------------------------------------
+;Copies frame from src buffer to dest buffer.
+;Entry: bx = video memory offset of the upper left
+;            corner of the frame.
+;       ds = video memory segment of the src buffer.
+;       es = video memory segment of the dest buffer.
+;Exit:
+;Expected:
+;Destroyed: ax, si, di, cx
+;----------------------------------------------------------------------------------------------
 
 printfRegsFlag          db  0
 
