@@ -385,12 +385,26 @@ printfFlagsColumn       proc
                         mov cx, 8h
                         push di
                         call printfVerticalString
+                        mov al, 0
+                        mov cx, 6h
+                        call printfVerticalString
                         pop di
+
 
                         add di, 2
                         mov al, '0'
                         xor ah, ah
                         mov cx, 8h
+                        call printfVerticalString
+
+                        push di
+                        mov al, 0
+                        mov cx, 6h
+                        call printfVerticalString
+                        pop di
+
+                        sub di, 4d
+                        mov cx, 6h
                         call printfVerticalString
 
                         ret
@@ -710,7 +724,7 @@ printfRegistersFrame    proc
                         mov byte ptr es:[di], 0CAh
 
                         sub di, 162d
-                        mov al, 0
+                        xor al, al
                         mov ah, 1
                         mov cx, 15d
                         call printfVerticalString
@@ -720,8 +734,27 @@ printfRegistersFrame    proc
                         mov cx, 15d
                         call printfVerticalString
 
+                        mov di, (80d*5+40d)*2
+                        mov cx, 15d
+                        call printfVerticalString
+
+                        mov di, (80d*5+35d)*2
+                        mov cx, 15d
+                        call printfVerticalString
+
                         ret
 printfRegistersFrame    endp
+;----------------------------------------------------------------------------------------------
+;Prints centered frame for register debugger.
+;on the number of lines and their length in the message
+;Entry: al = internal frame symbol ascii-code
+;       dh = the number of frame line
+;       dl = max length of the string in line
+;Exit:
+;Expected: es contains the address of the video memory segment.
+;Destroyed: ax, bx, cx, dx, si, di
+;----------------------------------------------------------------------------------------------
+
 
 printfRegsFlag          db  0
 
