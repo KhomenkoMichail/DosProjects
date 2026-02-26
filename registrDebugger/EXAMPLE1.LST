@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/23/26 23:42:29	    Page 1
+Turbo Assembler	 Version 4.1	    02/26/26 17:13:19	    Page 1
 example1.asm
 
 
@@ -60,7 +60,7 @@ example1.asm
      55	0166  07 5B 58					 pop es	bx ax
      56
      57	0169  EA					 db 0eah
-Turbo Assembler	 Version 4.1	    02/23/26 23:42:29	    Page 2
+Turbo Assembler	 Version 4.1	    02/26/26 17:13:19	    Page 2
 example1.asm
 
 
@@ -72,7 +72,7 @@ example1.asm
      62
      63	016E			     EOPPP:
      64				     end Start
-Turbo Assembler	 Version 4.1	    02/23/26 23:42:29	    Page 3
+Turbo Assembler	 Version 4.1	    02/26/26 17:13:19	    Page 3
 Symbol Table
 
 
@@ -80,9 +80,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/23/26"
+??DATE				  Text	 "02/26/26"
 ??FILENAME			  Text	 "example1"
-??TIME				  Text	 "23:42:29"
+??TIME				  Text	 "17:13:19"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP

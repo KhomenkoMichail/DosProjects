@@ -37,16 +37,9 @@ registersDebugger09Int      proc
 
                             in al, 60h
                             cmp al, 'W'
-                            jne @@normalMode
-                            mov bx, (80d*3+30d)*2
-
-                            push 0b800h
-                            pop ds
-                            push 0be00h
-                            pop es
-                            call copyFrame
-
-                            mov cs:printfRegsFlag, 1h
+                            je @@modeON
+                            cmp al, 'X'
+                            je @@modeOFF
 
 @@normalMode:               in al, 61h
                             or al, 80h
@@ -62,6 +55,34 @@ registersDebugger09Int      proc
                             db 0eah
 old09ofs                    dw 0
 old09seg                    dw 0
+
+@@modeON:                   cmp cs:printfRegsFlag, 0h
+                            jne @@normalMode
+
+                            mov bx, (80d*3+30d)*2
+
+                            push 0b800h
+                            pop ds
+                            push 0be00h
+                            pop es
+                            call copyFrame
+
+                            mov cs:printfRegsFlag, 1h
+                            jmp @@normalMode
+
+@@modeOFF:                  cmp cs:printfRegsFlag, 1h
+                            jne @@normalMode
+
+                            mov bx, (80d*3+30d)*2
+
+                            push 0be00h
+                            pop ds
+                            push 0b800h
+                            pop es
+                            call copyFrame
+
+                            mov cs:printfRegsFlag, 0h
+                            jmp @@normalMode
 
 registersDebugger09Int      endp
 ;------------------------------------------------------------------------------------------------
@@ -240,6 +261,7 @@ printfRegs08Int             proc
                             pop es
 
                             call copyFrame
+                            call updateSaveBuffer  ;;//FIXME
 
                             mov al, 20h
                             out 20h, al
@@ -434,7 +456,7 @@ printfFlagsColumn       endp
 ;Destroyed: ax, bx, cx, di
 ;----------------------------------------------------------------------------------------------
 
-printfVerticalString     proc
+printfVerticalString    proc
                         mov bx, 80d*2
                         cmp ah, 0
                         je @@nextElem
@@ -778,14 +800,14 @@ copyFrame               proc
                         mov di, bx
                         mov cx, 19d
 
-@@row:
+@@copyRow:
                         push cx si di
                         mov cx, 20d
                         rep movsw
                         pop di si cx
                         add si, 160d
                         add di, 160d
-                        loop @@row
+                        loop @@copyRow
 
                         ret
 
@@ -800,6 +822,46 @@ copyFrame               endp
 ;Expected:
 ;Destroyed: ax, si, di, cx
 ;----------------------------------------------------------------------------------------------
+
+updateSaveBuffer        proc
+
+                        push 0bd00h
+                        pop es
+                        push 0b800h
+                        pop ds
+                        mov si, (80d*3+30d)*2
+                        mov di, (80d*3+30d)*2
+
+                        mov cx, 19d
+
+@@cmpRow:
+                        push cx si di
+                        mov cx, 20d
+@@continue:             repe cmpsw
+                        je @@equal
+
+                        sub di, 2
+                        sub si, 2
+
+                        push 0be00h
+                        pop es
+                        mov ax, ds:[si]
+                        mov es:[si], ax
+
+                        push 0bd00h
+                        pop es
+                        add di, 2
+                        add si, 2
+
+                        jmp @@continue
+
+@@equal:                pop di si cx
+                        add si, 160d
+                        add di, 160d
+                        loop @@cmpRow
+
+                        ret
+updateSaveBuffer        endp
 
 printfRegsFlag          db  0
 
