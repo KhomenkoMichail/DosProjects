@@ -4,6 +4,18 @@
 org 100h
 locals @@
 
+
+FRAME_FIRST_ELEM_OFFSET EQU (80d*3+30d)*2
+AX_VM_OFFSET EQU (80d*6+33d)*2
+
+SCREEN_VM_SEGMENT EQU 0b800h
+SAVE_BUFFER_VM_SEGMENT EQU 0be00h
+DRAW_BUFFER_VM_SEGMENT EQU 0bd00h
+
+FRAME_ROW_WIDTH EQU 20d
+NUM_OF_FRAME_ROWS EQU 19d
+
+
 Start:
                 call replace09Int
                 call replace08Int
@@ -58,10 +70,10 @@ old09seg                    dw 0
 
 @@modeON:                   cmp cs:printfRegsFlag, 0
                             jne @@normalMode
-                            mov bx, (80d*3+30d)*2
-                            push 0b800h
+                            mov bx, FRAME_FIRST_ELEM_OFFSET
+                            push SCREEN_VM_SEGMENT
                             pop ds
-                            push 0be00h
+                            push SAVE_BUFFER_VM_SEGMENT
                             pop es
                             call copyFrame
 
@@ -71,11 +83,11 @@ old09seg                    dw 0
 @@modeOFF:                  cmp cs:printfRegsFlag, 1h
                             jne @@normalMode
 
-                            mov bx, (80d*3+30d)*2
+                            mov bx, FRAME_FIRST_ELEM_OFFSET
 
-                            push 0be00h
+                            push SAVE_BUFFER_VM_SEGMENT
                             pop ds
-                            push 0b800h
+                            push SCREEN_VM_SEGMENT
                             pop es
                             call copyFrame
 
@@ -162,9 +174,9 @@ printfRegs08Int             proc
 
                             call updateSaveBuffer
 
-                            push 0bd00h
+                            push DRAW_BUFFER_VM_SEGMENT
                             pop es
-                            mov bx, (80d*6+33d)*2
+                            mov bx, AX_VM_OFFSET
 
                             mov byte ptr es:[bx], 'a'
                             mov byte ptr es:[bx+2], 'x'
@@ -254,10 +266,10 @@ printfRegs08Int             proc
 
                             call printfRegistersFrame
 
-                            mov bx, (80d*3+30d)*2
-                            push 0bd00h
+                            mov bx, FRAME_FIRST_ELEM_OFFSET
+                            push DRAW_BUFFER_VM_SEGMENT
                             pop ds
-                            push 0b800h
+                            push SCREEN_VM_SEGMENT
                             pop es
 
                             call copyFrame
@@ -582,7 +594,7 @@ printfFrameBackgroundString         endp
 
 printfFrameForeground           proc
 
-                                sub di, 160*2
+                                sub di, 80d*2*2
                                 add di, 2
 
                                 mov al, 0C8h
@@ -658,7 +670,7 @@ printfFrameForeground           proc
                                 call printfVerticalString
                                 pop ax
 
-                                add di, 2*80d
+                                add di, 80d*2
                                 mov al, 0h
                                 call printfInternalFrame
 
@@ -797,11 +809,11 @@ copyFrame               proc
 
                         mov si, bx
                         mov di, bx
-                        mov cx, 19d
+                        mov cx, NUM_OF_FRAME_ROWS
 
 @@copyRow:
                         push cx si di
-                        mov cx, 20d
+                        mov cx, FRAME_ROW_WIDTH
                         rep movsw
                         pop di si cx
                         add si, 160d
@@ -826,19 +838,19 @@ updateSaveBuffer            proc
                             push ax
                             cld
 
-                            mov ax, 0bd00h
+                            mov ax, DRAW_BUFFER_VM_SEGMENT
                             mov es, ax
-                            mov ax, 0b800h
+                            mov ax, SCREEN_VM_SEGMENT
                             mov ds, ax
 
-                            mov si, (80d*3+30d)*2
+                            mov si, FRAME_FIRST_ELEM_OFFSET
                             mov di, si
 
-                            mov cx, 19d
+                            mov cx, NUM_OF_FRAME_ROWS
 @@cmpRaw:
                             push cx si di
 
-                            mov cx, 20d
+                            mov cx, FRAME_ROW_WIDTH
 @@cmpWord:
                             mov bx, ds:[si]
                             cmp bx, es:[di]
@@ -846,7 +858,7 @@ updateSaveBuffer            proc
 
                             push es
 
-                            mov ax, 0be00h
+                            mov ax, SAVE_BUFFER_VM_SEGMENT
                             mov es, ax
                             mov es:[si], bx
 
@@ -866,6 +878,13 @@ updateSaveBuffer            proc
                             pop ax
                             ret
 updateSaveBuffer            endp
+;----------------------------------------------------------------------------------------------
+;Compares DRAW buffer with frame on the screen and updates SAVE buffer if it finds differences.
+;Entry:
+;Exit:
+;Expected:
+;Destroyed: si, di, es, ds, bx, cx
+;----------------------------------------------------------------------------------------------
 
 printfRegsFlag              db  0
 
