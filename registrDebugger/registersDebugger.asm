@@ -15,6 +15,8 @@ DRAW_BUFFER_VM_SEGMENT EQU 0bd00h
 FRAME_ROW_WIDTH EQU 20d
 NUM_OF_FRAME_ROWS EQU 19d
 
+SHADOW_LEFT_ELEM_OFFSET EQU (80d*22+30d)*2
+SHADOW_ATTRIBUTE EQU 07h
 
 Start:
                 call replace09Int
@@ -76,6 +78,16 @@ old09seg                    dw 0
                             push SAVE_BUFFER_VM_SEGMENT
                             pop es
                             call copyFrame
+                            mov ah, 0
+                            call copyShadow
+
+                            push SAVE_BUFFER_VM_SEGMENT
+                            pop ds
+                            push DRAW_BUFFER_VM_SEGMENT
+                            pop es
+                            mov ah, 1
+                            call copyShadow
+
 
                             mov cs:printfRegsFlag, 1
                             jmp @@normalMode
@@ -90,6 +102,8 @@ old09seg                    dw 0
                             push SCREEN_VM_SEGMENT
                             pop es
                             call copyFrame
+                            mov ah, 0
+                            call copyShadow
 
                             mov cs:printfRegsFlag, 0h
                             jmp @@normalMode
@@ -173,6 +187,7 @@ printfRegs08Int             proc
                             cld
 
                             call updateSaveBuffer
+                            call updateSaveShadow
 
                             push DRAW_BUFFER_VM_SEGMENT
                             pop es
@@ -273,6 +288,8 @@ printfRegs08Int             proc
                             pop es
 
                             call copyFrame
+                            mov ah, 0
+                            call copyShadow
 
                             mov al, 20h
                             out 20h, al
@@ -847,7 +864,7 @@ updateSaveBuffer            proc
                             mov di, si
 
                             mov cx, NUM_OF_FRAME_ROWS
-@@cmpRaw:
+@@cmpRow:
                             push cx si di
 
                             mov cx, FRAME_ROW_WIDTH
@@ -873,18 +890,129 @@ updateSaveBuffer            proc
                             pop di si cx
                             add si, 160d
                             add di, 160d
-                            loop @@cmpRaw
+                            loop @@cmpRow
 
                             pop ax
                             ret
 updateSaveBuffer            endp
 ;----------------------------------------------------------------------------------------------
-;Compares DRAW buffer with frame on the screen and updates SAVE buffer if it finds differences.
+;Compares DRAW buffer with frame on the screen
+;and updates SAVE and DRAW buffers if it finds differences.
 ;Entry:
 ;Exit:
 ;Expected:
 ;Destroyed: si, di, es, ds, bx, cx
 ;----------------------------------------------------------------------------------------------
+
+copyShadow          proc
+                    cld
+
+                    mov al, 0FFh
+                    cmp ah, 0
+                    je @@notDark
+                    mov al, SHADOW_ATTRIBUTE
+@@notDark:
+
+                    mov si, SHADOW_LEFT_ELEM_OFFSET
+                    mov di, si
+
+                    mov cx, FRAME_ROW_WIDTH
+@@shadowRow:
+                    add si, 2
+                    add di, 2
+                    mov bx, ds:[si]
+                    and bl, al
+                    mov es:[di], bx
+                    loop @@shadowRow
+
+
+                    mov cx, (NUM_OF_FRAME_ROWS - 1)
+
+@@shadowColumn:     sub si, 80d*2
+                    sub di, 80d*2
+                    mov bx, ds:[si]
+                    and bh, al
+                    mov es:[di], bx
+                    loop @@shadowColumn
+
+                    ret
+copyShadow          endp
+;----------------------------------------------------------------------------------------------
+;Copies shadow from src buffer to dest buffer.
+;Entry: ah = flag (if af == 0 just copies shadow, else make copy dark)
+;       ds = video memory segment of the src buffer.
+;       es = video memory segment of the dest buffer.
+;Exit:
+;Expected:
+;Destroyed: al, si, di, cx, bx
+;----------------------------------------------------------------------------------------------
+
+updateSaveShadow            proc
+                            push ax
+
+                            mov ax, DRAW_BUFFER_VM_SEGMENT
+                            mov es, ax
+                            mov ax, SCREEN_VM_SEGMENT
+                            mov ds, ax
+
+                            mov si, SHADOW_LEFT_ELEM_OFFSET
+                            mov di, si
+
+                            mov cx, FRAME_ROW_WIDTH
+@@cmpShadowRow:
+                            add si, 2
+                            add di, 2
+                            mov bx, ds:[si]
+                            cmp bx, es:[di]
+                            je  @@noChangeInRow
+
+                            push es
+
+                            mov ax, SAVE_BUFFER_VM_SEGMENT
+                            mov es, ax
+                            mov es:[si], bx
+
+                            pop es
+                            and bh, SHADOW_ATTRIBUTE
+                            mov es:[di], bx
+
+@@noChangeInRow:
+                            loop @@cmpShadowRow
+
+                            mov cx, (NUM_OF_FRAME_ROWS - 1)
+@@cmpShadowColumn:
+                            sub si, 80d*2
+                            sub di, 80d*2
+                            mov bx, ds:[si]
+                            cmp bx, es:[di]
+                            je  @@noChangeInColumn
+
+                            push es
+
+                            mov ax, SAVE_BUFFER_VM_SEGMENT
+                            mov es, ax
+                            mov es:[si], bx
+
+                            pop es
+                            and bh, SHADOW_ATTRIBUTE
+                            mov es:[di], bx
+
+@@noChangeInColumn:
+                            loop @@cmpShadowColumn
+
+                            pop ax
+                            ret
+updateSaveShadow            endp
+;----------------------------------------------------------------------------------------------
+;Compares shadow of the frame in
+;DRAW buffer with those on the screen
+;and updates SAVE and DRAW buffer if it finds differences.
+;Entry:
+;Exit:
+;Expected:
+;Destroyed: si, di, es, ds, bx, cx
+;----------------------------------------------------------------------------------------------
+
 
 printfRegsFlag              db  0
 
