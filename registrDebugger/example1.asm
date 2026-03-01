@@ -19,11 +19,21 @@ Start:              mov ax, 3509h
                     mov es:[bx+2], ax
                     sti
 
+    	            mov ax, 1111h
+		            mov bx, 2222h
+	                mov cx, 3333h
+		            mov dx, 4444h
+		            mov si, 5555h
+		            mov di, 6666h
+
+                    push 7777h
+                    pop ds
+
                     pushf
                     push cs
                     call New09
 
-                    mov ax, 3100h
+end:                mov ax, 3100h
                     mov dx, offset EOPPP
                     shr dx, 4
                     inc dx
@@ -38,7 +48,9 @@ New09               proc
                     mov ah, 4eh
 
                     in al, 60h
-                    mov es:[bx], ax
+                    cmp al, 1
+		            je end
+                    mov flag, 1
 
                     in al, 61h
                     or al, 80h
@@ -56,6 +68,8 @@ old09ofs            dw 0
 old09seg            dw 0
 
 New09               endp
+
+flag                db 0
 
 EOPPP:
 end Start

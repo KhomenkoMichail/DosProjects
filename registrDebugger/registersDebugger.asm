@@ -56,18 +56,16 @@ registersDebugger09Int      proc
 old09ofs                    dw 0
 old09seg                    dw 0
 
-@@modeON:                   cmp cs:printfRegsFlag, 0h
+@@modeON:                   cmp cs:printfRegsFlag, 0
                             jne @@normalMode
-
                             mov bx, (80d*3+30d)*2
-
                             push 0b800h
                             pop ds
                             push 0be00h
                             pop es
                             call copyFrame
 
-                            mov cs:printfRegsFlag, 1h
+                            mov cs:printfRegsFlag, 1
                             jmp @@normalMode
 
 @@modeOFF:                  cmp cs:printfRegsFlag, 1h
@@ -161,6 +159,8 @@ printfRegs08Int             proc
 @@continue:                 push ax bx cx dx si di bp ds es ss
                             mov bp, sp
                             cld
+
+                            call updateSaveBuffer
 
                             push 0bd00h
                             pop es
@@ -261,7 +261,6 @@ printfRegs08Int             proc
                             pop es
 
                             call copyFrame
-                            call updateSaveBuffer  ;;//FIXME
 
                             mov al, 20h
                             out 20h, al
@@ -823,50 +822,55 @@ copyFrame               endp
 ;Destroyed: ax, si, di, cx
 ;----------------------------------------------------------------------------------------------
 
-updateSaveBuffer        proc
+updateSaveBuffer            proc
+                            push ax
+                            cld
 
-                        push 0bd00h
-                        pop es
-                        push 0b800h
-                        pop ds
-                        mov si, (80d*3+30d)*2
-                        mov di, (80d*3+30d)*2
+                            mov ax, 0bd00h
+                            mov es, ax
+                            mov ax, 0b800h
+                            mov ds, ax
 
-                        mov cx, 19d
+                            mov si, (80d*3+30d)*2
+                            mov di, si
 
-@@cmpRow:
-                        push cx si di
-                        mov cx, 20d
-@@continue:             repe cmpsw
-                        je @@equal
+                            mov cx, 19d
+@@cmpRaw:
+                            push cx si di
 
-                        sub di, 2
-                        sub si, 2
+                            mov cx, 20d
+@@cmpWord:
+                            mov bx, ds:[si]
+                            cmp bx, es:[di]
+                            je  @@noChange
 
-                        push 0be00h
-                        pop es
-                        mov ax, ds:[si]
-                        mov es:[si], ax
+                            push es
 
-                        push 0bd00h
-                        pop es
-                        add di, 2
-                        add si, 2
+                            mov ax, 0be00h
+                            mov es, ax
+                            mov es:[si], bx
 
-                        jmp @@continue
+                            pop es
+                            mov es:[di], bx
 
-@@equal:                pop di si cx
-                        add si, 160d
-                        add di, 160d
-                        loop @@cmpRow
+@@noChange:
+                            add si, 2
+                            add di, 2
+                            loop @@cmpWord
 
-                        ret
-updateSaveBuffer        endp
+                            pop di si cx
+                            add si, 160d
+                            add di, 160d
+                            loop @@cmpRaw
 
-printfRegsFlag          db  0
+                            pop ax
+                            ret
+updateSaveBuffer            endp
+
+printfRegsFlag              db  0
 
 endOfProgram:
-end                     Start
+end                         Start
 
 
 

@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/26/26 17:13:19	    Page 1
+Turbo Assembler	 Version 4.1	    02/26/26 22:47:26	    Page 1
 example1.asm
 
 
@@ -9,9 +9,9 @@ example1.asm
       4	0100  B8 3509		     Start:		 mov ax, 3509h
       5	0103  CD 21					 int 21h
       6
-      7	0105  89 1E 016Ar				 mov old09ofs, bx
+      7	0105  89 1E 018Er				 mov old09ofs, bx
       8	0109  8C C3					 mov bx, es
-      9	010B  89 1E 016Cr				 mov old09seg, bx
+      9	010B  89 1E 0190r				 mov old09seg, bx
      10
      11
      12	010F  50 55 8B EC C7 46	02+			 push 0
@@ -20,59 +20,75 @@ example1.asm
      15
      16	011A  BB 0024					 mov bx, 4*09h
      17	011D  FA					 cli
-     18	011E  26: C7 07	0140r				 mov es:[bx], offset New09
+     18	011E  26: C7 07	015Dr				 mov es:[bx], offset New09
      19	0123  8C C8					 mov ax, cs
      20	0125  26: 89 47	02				 mov es:[bx+2],	ax
      21	0129  FB					 sti
      22
-     23	012A  9C					 pushf
-     24	012B  0E					 push cs
-     25	012C  E8 0011					 call New09
-     26
-     27	012F  B8 3100					 mov ax, 3100h
-     28	0132  BA 016Er					 mov dx, offset	EOPPP
-     29	0135  D1 EA D1 EA D1 EA	D1+			 shr dx, 4
-     30	      EA
-     31	013D  42					 inc dx
-     32	013E  CD 21					 int 21h
+     23	012A  B8 1111					 mov ax, 1111h
+     24	012D  BB 2222						 mov bx, 2222h
+     25	0130  B9 3333					     mov cx, 3333h
+     26	0133  BA 4444						 mov dx, 4444h
+     27	0136  BE 5555						 mov si, 5555h
+     28	0139  BF 6666						 mov di, 6666h
+     29
+     30	013C  50 55 8B EC C7 46	02+			 push 7777h
+     31	      7777 5D
+     32	0146  1F					 pop ds
      33
-     34	0140			     New09		 proc
-     35	0140  50 53 06					 push ax bx es
-     36
-     37	0143  50 55 8B EC C7 46	02+			 push 0b800h
-     38	      B800 5D
-     39	014D  07					 pop es
-     40	014E  BB 0370					 mov bx, (80d*5	+ 40d)*2
-     41	0151  B4 4E					 mov ah, 4eh
-     42
-     43	0153  E4 60					 in al,	60h
-     44	0155  26: 89 07					 mov es:[bx], ax
-     45
-     46	0158  E4 61					 in al,	61h
-     47	015A  0C 80					 or al,	80h
-     48	015C  E6 61					 out 61h, al
-     49	015E  24 7F					 and al, not 80h
-     50	0160  E6 61					 out 61h, al
-     51
-     52	0162  B0 20					 mov al, 20h
-     53	0164  E6 20					 out 20h, al
-     54
-     55	0166  07 5B 58					 pop es	bx ax
-     56
-     57	0169  EA					 db 0eah
-Turbo Assembler	 Version 4.1	    02/26/26 17:13:19	    Page 2
+     34	0147  9C					 pushf
+     35	0148  0E					 push cs
+     36	0149  E8 0011					 call New09
+     37
+     38	014C  B8 3100		     end:		 mov ax, 3100h
+*Warning* example1.asm(36) Reserved word used as symbol: END
+     39	014F  BA 0193r					 mov dx, offset	EOPPP
+     40	0152  D1 EA D1 EA D1 EA	D1+			 shr dx, 4
+     41	      EA
+     42	015A  42					 inc dx
+     43	015B  CD 21					 int 21h
+     44
+     45	015D			     New09		 proc
+     46	015D  50 53 06					 push ax bx es
+     47
+     48	0160  50 55 8B EC C7 46	02+			 push 0b800h
+     49	      B800 5D
+     50	016A  07					 pop es
+     51	016B  BB 0370					 mov bx, (80d*5	+ 40d)*2
+     52	016E  B4 4E					 mov ah, 4eh
+     53
+     54	0170  E4 60					 in al,	60h
+     55	0172  3C 01					 cmp al, 1
+     56	0174  74 D6						 je end
+Turbo Assembler	 Version 4.1	    02/26/26 22:47:26	    Page 2
 example1.asm
 
 
 
-     58	016A  0000		     old09ofs		 dw 0
-     59	016C  0000		     old09seg		 dw 0
-     60
-     61	016E			     New09		 endp
-     62
-     63	016E			     EOPPP:
-     64				     end Start
-Turbo Assembler	 Version 4.1	    02/26/26 17:13:19	    Page 3
+     57	0176  C6 06 0192r 01 90				 mov flag, 1
+     58
+     59	017C  E4 61					 in al,	61h
+     60	017E  0C 80					 or al,	80h
+     61	0180  E6 61					 out 61h, al
+     62	0182  24 7F					 and al, not 80h
+     63	0184  E6 61					 out 61h, al
+     64
+     65	0186  B0 20					 mov al, 20h
+     66	0188  E6 20					 out 20h, al
+     67
+     68	018A  07 5B 58					 pop es	bx ax
+     69
+     70	018D  EA					 db 0eah
+     71	018E  0000		     old09ofs		 dw 0
+     72	0190  0000		     old09seg		 dw 0
+     73
+     74	0192			     New09		 endp
+     75
+     76	0192  00		     flag		 db 0
+     77
+     78	0193			     EOPPP:
+     79				     end Start
+Turbo Assembler	 Version 4.1	    02/26/26 22:47:26	    Page 3
 Symbol Table
 
 
@@ -82,7 +98,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/26/26"
 ??FILENAME			  Text	 "example1"
-??TIME				  Text	 "17:13:19"
+??TIME				  Text	 "22:47:26"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP
@@ -96,15 +112,23 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-EOPPP				  Near	 DGROUP:016E
-NEW09				  Near	 DGROUP:0140
-OLD09OFS			  Word	 DGROUP:016A
-OLD09SEG			  Word	 DGROUP:016C
+END				  Near	 DGROUP:014C
+EOPPP				  Near	 DGROUP:0193
+FLAG				  Byte	 DGROUP:0192
+NEW09				  Near	 DGROUP:015D
+OLD09OFS			  Word	 DGROUP:018E
+OLD09SEG			  Word	 DGROUP:0190
 START				  Near	 DGROUP:0100
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  016E Word	  Public  CODE
+  _TEXT				  16  0193 Word	  Public  CODE
+Turbo Assembler	 Version 4.1	    02/26/26 22:47:26	    Page 4
+Error Summary
+
+
+
+*Warning* example1.asm(36) Reserved word used as symbol: END
 
