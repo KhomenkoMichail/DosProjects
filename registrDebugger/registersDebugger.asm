@@ -7,6 +7,7 @@ locals @@
 
 FRAME_FIRST_ELEM_OFFSET         EQU (80d*3+30d)*2
 AX_VM_OFFSET                    EQU (80d*6+33d)*2
+CF_VM_OFFSET                    EQU (80d*6+44d)*2
 
 SCREEN_VM_SEGMENT               EQU 0b800h
 SAVE_BUFFER_VM_SEGMENT          EQU 0be00h
@@ -20,6 +21,7 @@ SHADOW_ATTRIBUTE                EQU 07h
 
 WHITE_ON_CYAN_ATTRIBUTE         EQU 3Fh
 REG_STRING_LEN                  EQU 7h
+FLAG_STRING_LEN                 EQU 3h
 
 Start:
                 call replace09Int
@@ -295,6 +297,7 @@ printfRegs08Int             proc
 
                             push bx
                             call compareRegs
+                            call compareFlags
                             pop bx
 
 
@@ -1154,7 +1157,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr]
                             je @@noChangeAX
                             mov cs:[regChanged], 1h
-@@whiteAX:                  call makeRegWhite
+
+@@whiteAX:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeAX:
                             add bx, 80d*2
 
@@ -1164,7 +1169,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 1*2]
                             je @@noChangeBX
                             mov cs:[regChanged + 1], 1h
-@@whiteBX:                  call makeRegWhite
+
+@@whiteBX:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeBX:
                             add bx, 80d*2
 
@@ -1174,7 +1181,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 2*2]
                             je @@noChangeCX
                             mov cs:[regChanged + 2], 1h
-@@whiteCX:                  call makeRegWhite
+
+@@whiteCX:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeCX:
                             add bx, 80d*2
 
@@ -1184,7 +1193,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 3*2]
                             je @@noChangeDX
                             mov cs:[regChanged + 3], 1h
-@@whiteDX:                  call makeRegWhite
+
+@@whiteDX:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeDX:
                             add bx, 80d*2
 
@@ -1194,7 +1205,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 4*2]
                             je @@noChangeSI
                             mov cs:[regChanged + 4], 1h
-@@whiteSI:                  call makeRegWhite
+
+@@whiteSI:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeSI:
                             add bx, 80d*2
 
@@ -1204,7 +1217,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 5*2]
                             je @@noChangeDI
                             mov cs:[regChanged + 5], 1h
-@@whiteDI:                  call makeRegWhite
+
+@@whiteDI:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeDI:
                             add bx, 80d*2
 
@@ -1214,7 +1229,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 6*2]
                             je @@noChangeBP
                             mov cs:[regChanged + 6], 1h
-@@whiteBP:                  call makeRegWhite
+
+@@whiteBP:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeBP:
                             add bx, 80d*2
 
@@ -1225,7 +1242,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 7*2]
                             je @@noChangeSP
                             mov cs:[regChanged + 7], 1h
-@@whiteSP:                  call makeRegWhite
+
+@@whiteSP:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeSP:
                             add bx, 80d*2
 
@@ -1235,7 +1254,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 8*2]
                             je @@noChangeDS
                             mov cs:[regChanged + 8], 1h
-@@whiteDS:                  call makeRegWhite
+
+@@whiteDS:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeDS:
                             add bx, 80d*2
 
@@ -1245,7 +1266,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 9d*2]
                             je @@noChangeES
                             mov cs:[regChanged + 9d], 1h
-@@whiteES:                  call makeRegWhite
+
+@@whiteES:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeES:
                             add bx, 80d*2
 
@@ -1255,7 +1278,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 10d*2]
                             je @@noChangeSS
                             mov cs:[regChanged + 10d], 1h
-@@whiteSS:                  call makeRegWhite
+
+@@whiteSS:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeSS:
                             add bx, 80d*2
 
@@ -1265,7 +1290,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 11d*2]
                             je @@noChangeCS
                             mov cs:[regChanged + 11d], 1h
-@@whiteCS:                  call makeRegWhite
+
+@@whiteCS:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeCS:
                             add bx, 80d*2
 
@@ -1275,7 +1302,9 @@ compareRegs                 proc
                             cmp ax, cs:[regsArr + 12d*2]
                             je @@noChangeIP
                             mov cs:[regChanged + 12d], 1h
-@@whiteIP:                  call makeRegWhite
+
+@@whiteIP:                  mov cx, REG_STRING_LEN
+                            call makeTextWhite
 @@noChangeIP:
                             ret
 compareRegs                 endp
@@ -1289,9 +1318,135 @@ compareRegs                 endp
 ;Destroyed: cx
 ;----------------------------------------------------------------------------------------------
 
-makeRegWhite                proc
+compareFlags                proc
+                            mov ax, [bp + 24d]
+                            mov bx, CF_VM_OFFSET
+
+
+                            cmp cs:[flagsChanged], 1h
+                            je @@whiteCF
+                            mov dx, ax
+                            and dx, 0000000000000001b
+                            cmp cs:[flagsArr], dl
+                            je @@noChangeCF
+                            mov cs:[flagsChanged], 1h
+@@whiteCF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangeCF:
+                            add bx, 80d*2
+
+
+                            cmp cs:[flagsChanged + 1], 1h
+                            je @@whiteZF
+                            mov dx, ax
+                            and dx, 0000000001000000b
+                            shr dx, 6d
+                            cmp cs:[flagsArr + 1], dl
+                            je @@noChangeZF
+                            mov cs:[flagsChanged + 1], 1h
+@@whiteZF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangeZF:
+                            add bx, 80d*2
+
+
+                            cmp cs:[flagsChanged + 2], 1h
+                            je @@whiteSF
+                            mov dx, ax
+                            and dx, 0000000010000000b
+                            shr dx, 7d
+                            cmp cs:[flagsArr + 2], dl
+                            je @@noChangeSF
+                            mov cs:[flagsChanged + 2], 1h
+@@whiteSF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangeSF:
+                            add bx, 80d*2
+
+                            cmp cs:[flagsChanged + 3], 1h
+                            je @@whiteOF
+                            mov dx, ax
+                            and dx, 0000100000000000b
+                            shr dx, 11d
+                            cmp cs:[flagsArr + 3], dl
+                            je @@noChangeOF
+                            mov cs:[flagsChanged + 3], 1h
+@@whiteOF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangeOF:
+                            add bx, 80d*2
+
+
+                            cmp cs:[flagsChanged + 4], 1h
+                            je @@whitePF
+                            mov dx, ax
+                            and dx, 0000000000000100b
+                            shr dx, 2d
+                            cmp cs:[flagsArr + 4], dl
+                            je @@noChangePF
+                            mov cs:[flagsChanged + 4], 1h
+@@whitePF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangePF:
+                            add bx, 80d*2
+
+
+                            cmp cs:[flagsChanged + 5], 1h
+                            je @@whiteAF
+                            mov dx, ax
+                            and dx, 0000000000010000b
+                            shr dx, 4d
+                            cmp cs:[flagsArr + 5], dl
+                            je @@noChangeAF
+                            mov cs:[flagsChanged + 5], 1h
+@@whiteAF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangeAF:
+                            add bx, 80d*2
+
+
+                            cmp cs:[flagsChanged + 6], 1h
+                            je @@whiteIF
+                            mov dx, ax
+                            and dx, 0000001000000000b
+                            shr dx, 9d
+                            cmp cs:[flagsArr + 6], dl
+                            je @@noChangeIF
+                            mov cs:[flagsChanged + 6], 1h
+@@whiteIF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangeIF:
+                            add bx, 80d*2
+
+
+                            cmp cs:[flagsChanged + 7], 1h
+                            je @@whiteDF
+                            mov dx, ax
+                            and dx, 0000010000000000b
+                            shr dx, 10d
+                            cmp cs:[flagsArr + 7], dl
+                            je @@noChangeDF
+                            mov cs:[flagsChanged + 7], 1h
+@@whiteDF:
+                            mov cx, FLAG_STRING_LEN
+                            call makeTextWhite
+@@noChangeDF:
+                            ret
+compareFlags                endp
+
+
+
+
+makeTextWhite               proc
                             push bx
-                            mov cx, REG_STRING_LEN
+
 
 @@regString:                mov byte ptr es:[bx + 1], WHITE_ON_CYAN_ATTRIBUTE
                             add bx, 2d
@@ -1299,10 +1454,11 @@ makeRegWhite                proc
 
                             pop bx
                             ret
-makeRegWhite                endp
+makeTextWhite               endp
 ;----------------------------------------------------------------------------------------------
-;Changes the color of characters in the register line to white color.
-;Entry: bx = video memory offset of the start of register string
+;Changes the color of characters in the line to white color.
+;Entry: bx = video memory offset of the start of the string
+;       cx = length of the string
 ;Exit:
 ;Expected:
 ;Destroyed: cx
