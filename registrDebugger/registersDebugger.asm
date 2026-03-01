@@ -5,18 +5,21 @@ org 100h
 locals @@
 
 
-FRAME_FIRST_ELEM_OFFSET EQU (80d*3+30d)*2
-AX_VM_OFFSET EQU (80d*6+33d)*2
+FRAME_FIRST_ELEM_OFFSET         EQU (80d*3+30d)*2
+AX_VM_OFFSET                    EQU (80d*6+33d)*2
 
-SCREEN_VM_SEGMENT EQU 0b800h
-SAVE_BUFFER_VM_SEGMENT EQU 0be00h
-DRAW_BUFFER_VM_SEGMENT EQU 0bd00h
+SCREEN_VM_SEGMENT               EQU 0b800h
+SAVE_BUFFER_VM_SEGMENT          EQU 0be00h
+DRAW_BUFFER_VM_SEGMENT          EQU 0bd00h
 
-FRAME_ROW_WIDTH EQU 20d
-NUM_OF_FRAME_ROWS EQU 19d
+FRAME_ROW_WIDTH                 EQU 20d
+NUM_OF_FRAME_ROWS               EQU 19d
 
-SHADOW_LEFT_ELEM_OFFSET EQU (80d*22+30d)*2
-SHADOW_ATTRIBUTE EQU 07h
+SHADOW_LEFT_ELEM_OFFSET         EQU (80d*22+30d)*2
+SHADOW_ATTRIBUTE                EQU 07h
+
+WHITE_ON_CYAN_ATTRIBUTE         EQU 3Fh
+REG_STRING_LEN                  EQU 7h
 
 Start:
                 call replace09Int
@@ -90,6 +93,7 @@ old09seg                    dw 0
 
 
                             mov cs:printfRegsFlag, 1
+                            call initChangingArrs
                             jmp @@normalMode
 
 @@modeOFF:                  cmp cs:printfRegsFlag, 1h
@@ -106,6 +110,7 @@ old09seg                    dw 0
                             call copyShadow
 
                             mov cs:printfRegsFlag, 0h
+                            mov cs:saveRegsFlag, 0h
                             jmp @@normalMode
 
 registersDebugger09Int      endp
@@ -186,7 +191,12 @@ printfRegs08Int             proc
                             mov bp, sp
                             cld
 
-                            call updateSaveBuffer
+                            cmp cs:saveRegsFlag, 0h
+                            jne @@alreadySaved
+                            call saveRegsAndFlags
+                            mov cs:saveRegsFlag, 1h
+
+@@alreadySaved:             call updateSaveBuffer
                             call updateSaveShadow
 
                             push DRAW_BUFFER_VM_SEGMENT
@@ -237,7 +247,7 @@ printfRegs08Int             proc
                             mov byte ptr es:[bx], 's'
                             mov byte ptr es:[bx+2], 'p'
                             mov ax, sp
-                            sub ax, 13d*2
+                            add ax, 13d*2
                             call printfHexRegValue
 
                             add bx, 80d*2
@@ -270,6 +280,7 @@ printfRegs08Int             proc
                             mov ax, [bp+20]
                             call printfHexRegValue
 
+
                             mov ax, [bp+24]
                             sub bx, 80d*2*12d
                             add bx, 11d*2
@@ -281,12 +292,17 @@ printfRegs08Int             proc
 
                             call printfRegistersFrame
 
+
+                            push bx
+                            call compareRegs
+                            pop bx
+
+
                             mov bx, FRAME_FIRST_ELEM_OFFSET
                             push DRAW_BUFFER_VM_SEGMENT
                             pop ds
                             push SCREEN_VM_SEGMENT
                             pop es
-
                             call copyFrame
                             mov ah, 0
                             call copyShadow
@@ -422,7 +438,6 @@ printfFlags             proc
                         cmp dx, 0
                         je @@zeroDF
                         mov byte ptr es:[bx + 80d*2*7], '1'
-
 @@zeroDF:
                         ret
 printfFlags             endp
@@ -1013,8 +1028,319 @@ updateSaveShadow            endp
 ;Destroyed: si, di, es, ds, bx, cx
 ;----------------------------------------------------------------------------------------------
 
+saveRegsAndFlags            proc
+                            push ax dx
+
+                            mov cs:[regsArr], ax
+
+                            mov ax, [bp + 16d]
+                            mov cs:[regsArr + 2d], ax
+
+                            mov ax, [bp + 14d]
+                            mov cs:[regsArr + 4d], ax
+
+                            mov ax, [bp + 12d]
+                            mov cs:[regsArr + 6d], ax
+
+                            mov ax, [bp + 10d]
+                            mov cs:[regsArr + 8d], ax
+
+                            mov ax, [bp + 8d]
+                            mov cs:[regsArr + 10d], ax
+
+                            mov ax, [bp + 6d]
+                            mov cs:[regsArr + 12d], ax
+
+                            mov ax, sp
+                            add ax, 16d*2
+                            mov cs:[regsArr + 14d], ax
+
+                            mov ax, [bp + 4d]
+                            mov cs:[regsArr + 16d], ax
+
+                            mov ax, [bp + 2d]
+                            mov cs:[regsArr + 18d], ax
+
+                            mov ax, [bp]
+                            mov cs:[regsArr + 20d], ax
+
+                            mov ax, [bp + 22d]
+                            mov cs:[regsArr + 22d], ax
+
+                            mov ax, [bp + 20d]
+                            mov cs:[regsArr + 24d], ax
+
+                            mov ax, [bp + 24d]
+
+                            mov dx, ax
+                            and dx, 0000000000000001b
+                            cmp dx, 0
+                            je @@zeroCF
+                            mov byte ptr cs:[flagsArr], 1
+@@zeroCF:
+
+                            mov dx, ax
+                            and dx, 0000000001000000b
+                            cmp dx, 0
+                            je @@zeroZF
+                            mov byte ptr cs:[flagsArr + 1], 1
+@@zeroZF:
+                            mov dx, ax
+                            and dx, 0000000010000000b
+                            cmp dx, 0
+                            je @@zeroSF
+                            mov byte ptr cs:[flagsArr + 2], 1
+@@zeroSF:
+                            mov dx, ax
+                            and dx, 0000100000000000b
+                            cmp dx, 0
+                            je @@zeroOF
+                            mov byte ptr cs:[flagsArr + 3], 1
+@@zeroOF:
+                            mov dx, ax
+                            and dx, 0000000000000100b
+                            cmp dx, 0
+                            je @@zeroPF
+                            mov byte ptr cs:[flagsArr + 4], 1
+@@zeroPF:
+                            mov dx, ax
+                            and dx, 0000000000010000b
+                            cmp dx, 0
+                            je @@zeroAF
+                            mov byte ptr cs:[flagsArr + 5], 1
+@@zeroAF:
+                            mov dx, ax
+                            and dx, 0000001000000000b
+                            cmp dx, 0
+                            je @@zeroIF
+                            mov byte ptr cs:[flagsArr + 6], 1
+@@zeroIF:
+                            mov dx, ax
+                            and dx, 0000010000000000b
+                            cmp dx, 0
+                            je @@zeroDF
+                            mov byte ptr cs:[flagsArr + 7], 1
+
+@@zeroDF:
+                            pop dx ax
+                            ret
+saveRegsAndFlags            endp
+;----------------------------------------------------------------------------------------------
+;Saves registers and flags values in buffers.
+;Entry:
+;Exit:
+;Expected:                  [bp]    = ss
+;                           [bp+2]  = es
+;                           [bp+4]  = ds
+;                           [bp+6]  = bp
+;                           [bp+8]  = di
+;                           [bp+10] = si
+;                           [bp+12] = dx
+;                           [bp+14] = cx
+;                           [bp+16] = bx
+;                           [bp+18] = ax
+;                           [bp+20] = ip
+;                           [bp+22] = cs
+;                           [bp+24] = flags
+;Destroyed:
+;----------------------------------------------------------------------------------------------
+
+compareRegs                 proc
+                            mov bx, AX_VM_OFFSET
+
+                            cmp cs:[regChanged], 1h
+                            je @@whiteAX
+                            mov ax, [bp + 18d]
+                            cmp ax, cs:[regsArr]
+                            je @@noChangeAX
+                            mov cs:[regChanged], 1h
+@@whiteAX:                  call makeRegWhite
+@@noChangeAX:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 1], 1h
+                            je @@whiteBX
+                            mov ax, [bp + 16d]
+                            cmp ax, cs:[regsArr + 1*2]
+                            je @@noChangeBX
+                            mov cs:[regChanged + 1], 1h
+@@whiteBX:                  call makeRegWhite
+@@noChangeBX:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 2], 1h
+                            je @@whiteCX
+                            mov ax, [bp + 14d]
+                            cmp ax, cs:[regsArr + 2*2]
+                            je @@noChangeCX
+                            mov cs:[regChanged + 2], 1h
+@@whiteCX:                  call makeRegWhite
+@@noChangeCX:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 3], 1h
+                            je @@whiteDX
+                            mov ax, [bp + 12d]
+                            cmp ax, cs:[regsArr + 3*2]
+                            je @@noChangeDX
+                            mov cs:[regChanged + 3], 1h
+@@whiteDX:                  call makeRegWhite
+@@noChangeDX:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 4], 1h
+                            je @@whiteSI
+                            mov ax, [bp + 10d]
+                            cmp ax, cs:[regsArr + 4*2]
+                            je @@noChangeSI
+                            mov cs:[regChanged + 4], 1h
+@@whiteSI:                  call makeRegWhite
+@@noChangeSI:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 5], 1h
+                            je @@whiteDI
+                            mov ax, [bp + 8d]
+                            cmp ax, cs:[regsArr + 5*2]
+                            je @@noChangeDI
+                            mov cs:[regChanged + 5], 1h
+@@whiteDI:                  call makeRegWhite
+@@noChangeDI:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 6], 1h
+                            je @@whiteBP
+                            mov ax, [bp + 6d]
+                            cmp ax, cs:[regsArr + 6*2]
+                            je @@noChangeBP
+                            mov cs:[regChanged + 6], 1h
+@@whiteBP:                  call makeRegWhite
+@@noChangeBP:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 7], 1h
+                            je @@whiteSP
+                            mov ax, bp
+                            add ax, 26d
+                            cmp ax, cs:[regsArr + 7*2]
+                            je @@noChangeSP
+                            mov cs:[regChanged + 7], 1h
+@@whiteSP:                  call makeRegWhite
+@@noChangeSP:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 8], 1h
+                            je @@whiteDS
+                            mov ax, [bp + 4d]
+                            cmp ax, cs:[regsArr + 8*2]
+                            je @@noChangeDS
+                            mov cs:[regChanged + 8], 1h
+@@whiteDS:                  call makeRegWhite
+@@noChangeDS:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 9], 1h
+                            je @@whiteES
+                            mov ax, [bp + 2d]
+                            cmp ax, cs:[regsArr + 9d*2]
+                            je @@noChangeES
+                            mov cs:[regChanged + 9d], 1h
+@@whiteES:                  call makeRegWhite
+@@noChangeES:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 10], 1h
+                            je @@whiteSS
+                            mov ax, [bp]
+                            cmp ax, cs:[regsArr + 10d*2]
+                            je @@noChangeSS
+                            mov cs:[regChanged + 10d], 1h
+@@whiteSS:                  call makeRegWhite
+@@noChangeSS:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 11], 1h
+                            je @@whiteCS
+                            mov ax, [bp + 22d]
+                            cmp ax, cs:[regsArr + 11d*2]
+                            je @@noChangeCS
+                            mov cs:[regChanged + 11d], 1h
+@@whiteCS:                  call makeRegWhite
+@@noChangeCS:
+                            add bx, 80d*2
+
+                            cmp cs:[regChanged + 12], 1h
+                            je @@whiteIP
+                            mov ax, [bp + 20d]
+                            cmp ax, cs:[regsArr + 12d*2]
+                            je @@noChangeIP
+                            mov cs:[regChanged + 12d], 1h
+@@whiteIP:                  call makeRegWhite
+@@noChangeIP:
+                            ret
+compareRegs                 endp
+;----------------------------------------------------------------------------------------------
+;Compares current registers values with values saved in buffer
+;and changes the color of characters in the register line to white color
+;if it finds differences.
+;Entry: bx = video memory offset of the start of register string
+;Exit:
+;Expected:
+;Destroyed: cx
+;----------------------------------------------------------------------------------------------
+
+makeRegWhite                proc
+                            push bx
+                            mov cx, REG_STRING_LEN
+
+@@regString:                mov byte ptr es:[bx + 1], WHITE_ON_CYAN_ATTRIBUTE
+                            add bx, 2d
+                            loop @@regString
+
+                            pop bx
+                            ret
+makeRegWhite                endp
+;----------------------------------------------------------------------------------------------
+;Changes the color of characters in the register line to white color.
+;Entry: bx = video memory offset of the start of register string
+;Exit:
+;Expected:
+;Destroyed: cx
+;----------------------------------------------------------------------------------------------
+
+initChangingArrs            proc
+                            xor al, al
+                            xor di, di
+
+                            mov cx, 13d
+
+@@continue1:                mov byte ptr cs:[regChanged + di], al
+                            inc di
+                            loop @@continue1
+
+                            mov cx, 8d
+                            xor di, di
+@@continue2:                mov byte ptr cs:[flagsChanged + di], al
+                            inc di
+                            loop @@continue2
+
+                            ret
+initChangingArrs            endp
+;----------------------------------------------------------------------------------------------
+;Inits arrays "regChanged" and "flagsChanged" with zeroes.
+;Entry:
+;Exit:
+;Expected:
+;Destroyed: al, di, cx
+;----------------------------------------------------------------------------------------------
 
 printfRegsFlag              db  0
+saveRegsFlag                db  0
+regsArr                     dw  13 dup(0)
+regChanged                  db  13 dup(0)
+
+flagsArr                    db  8 dup(0)
+flagsChanged                db  8 dup(0)
 
 endOfProgram:
 end                         Start
