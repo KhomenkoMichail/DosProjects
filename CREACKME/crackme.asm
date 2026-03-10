@@ -25,7 +25,7 @@ messageFail                 db      "Access denied."
 
 password                    db      "thankYou"
 
-bufferData                  db 15 dup(0)
+bufferData                  db 256 dup(0)
 
 main:
                             cld
@@ -34,10 +34,6 @@ main:
 
                             push cx
                             call cmpPasswords
-                            nop
-                            nop
-                            nop
-                            nop
 
                             cmp dx, PASSWORD_SUCCESS
                             je grant
@@ -45,10 +41,9 @@ main:
 
 grant:                      call    printfSuccessMessage
 
-endProgram:                 mov ax, 4c00h
+endProgram:
+                            mov ax, 4c00h
                             int 21h
-
-
 
 
 getPassword                 proc
@@ -106,16 +101,19 @@ getStringHash               endp
 cmpPasswords                proc
                             push bp
                             mov bp, sp
-                            sub sp, 16d
+
+                            xor ax, ax
+                            mov byte ptr al, [bp + 4]
+                            add al, 1
+                            sub sp, ax
 
                             lea si, bufferData
-                            lea di, [bp-16d]
+                            mov di, sp
                             mov cx, [bp+4]
-                            xor ch, ch
                             rep movsb
 
                             mov cx, [bp+4]
-                            lea si, [bp-16d]
+                            mov si, sp
                             call getStringHash
 
                             mov bx, ax
@@ -137,7 +135,7 @@ cmpPasswords                proc
                             pop ds
 
                             lea si, password
-                            lea di, [bp-16d]
+                            mov di, sp
 
                             xor ch, ch
                             mov cx, [bp+4]
@@ -494,7 +492,6 @@ printfSuccessMessage            proc
                                 stosw
                                 loop @@print_char
 
-                                jmp endProgram
 
                                 ret
 printfSuccessMessage            endp
@@ -541,5 +538,7 @@ printfFailMessage               endp
 ;Destroyed: ax, bx, cx, dx, si, di, es
 ;----------------------------------------------------------------------------------------------
 
+old21ofs            dw 0
+old21seg            dw 0
 
 end             Start

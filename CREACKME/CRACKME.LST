@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 1
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 1
 crackme.asm
 
 
@@ -9,579 +9,624 @@ crackme.asm
       4				     locals @@
       5				     org 100h
       6
-      7	      =0001		     PASSWORD_SUCCESS	     equ     1h
-      8	      =0008		     PASSWORD_LENGTH	     equ     8h
+      7	      =0001		     PASSWORD_SUCCESS		 equ	 1h
+      8	      =0008		     PASSWORD_LENGTH		 equ	 8h
       9
-     10	      =000F		     MESSAGE_SUCCESS_LENGTH  equ     15d
-     11	      =000E		     MESSAGE_FAIL_LENGTH     equ     14d
+     10	      =000F		     MESSAGE_SUCCESS_LENGTH	 equ	 15d
+     11	      =000E		     MESSAGE_FAIL_LENGTH	 equ	 14d
      12
-     13	      =00AE		     MESSAGE_SUCCESS_COLOR   equ     0AEh
-     14	      =00CF		     MESSAGE_FAIL_COLOR	     equ     0CFh
+     13	      =00AE		     MESSAGE_SUCCESS_COLOR	 equ	 0AEh
+     14	      =00CF		     MESSAGE_FAIL_COLOR		 equ	 0CFh
      15
-     16	      =000D		     ENTER_ASCII_CODE	     equ     0dh
+     16	      =000D		     ENTER_ASCII_CODE		 equ	 0dh
      17
      18	0100			     Start:
      19
-     20	0100  EB 35 90					     jmp main
+     20	0100  E9 0125					     jmp main
      21
      22
-     23	0103  41 63 63 65 73 73	20+  messageSuccess	     db	     "Access granted!"
+     23	0103  41 63 63 65 73 73	20+  messageSuccess		 db	 "Access granted!"
      24	      67 72 61 6E 74 65	64+
      25	      21
-     26	0112  41 63 63 65 73 73	20+  messageFail	     db	     "Access denied."
+     26	0112  41 63 63 65 73 73	20+  messageFail		 db	 "Access denied."
      27	      64 65 6E 69 65 64	2E
      28
-     29	0120  74 68 61 6E 6B 59	6F+  password		     db	     "thankYou"
+     29	0120  74 68 61 6E 6B 59	6F+  password			 db	 "thankYou"
      30	      75
      31
-     32	0128  0F*(00)		     bufferData		     db	15 dup(0)
+     32	0128  0100*(00)		     bufferData			 db 256	dup(0)
      33
-     34	0137			     main:
-     35	0137  FC						 cld
+     34	0228			     main:
+     35	0228  FC						 cld
      36
-     37	0138  E8 0018						 call getPassword
-     38
-     39	013B  51						 push cx
-     40	013C  E8 0041						 call cmpPasswords
-     41	013F  90						 nop
-     42	0140  90						 nop
-     43	0141  90						 nop
-     44	0142  90						 nop
+     37	0229  B8 3521						 mov ax, 3521h
+     38	022C  CD 21						 int 21h
+     39
+     40	022E  89 1E 047Ar					 mov old21ofs, bx
+     41	0232  8C C3						 mov bx, es
+     42	0234  89 1E 047Cr					 mov old21seg, bx
+     43	0238  0E						 push cs
+     44	0239  07						 pop es
      45
-     46	0143  83 FA 01						 cmp dx, PASSWORD_SUCCESS
-     47	0146  74 03						 je grant
-     48	0148  E8 01ED						 call	 printfFailMessage
-     49
-     50	014B  E8 01C9		     grant:			 call	 printfSuccessMessage
-     51
-     52	014E  B8 4C00		     endProgram:		 mov ax, 4c00h
-     53	0151  CD 21						 int 21h
+     46	023A  E8 0031						 call getPassword
+     47
+     48	023D  51						 push cx
+     49	023E  E8 005A						 call cmpPasswords
+     50
+     51	0241  83 FA 01						 cmp dx, PASSWORD_SUCCESS
+     52	0244  74 03						 je grant
+     53	0246  E8 0210						 call	 printfFailMessage
      54
-     55
-     56	0153			     getPassword		 proc
-     57
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 2
+     55	0249  E8 01E7		     grant:			 call	 printfSuccessMessage
+     56
+     57	024C  50 55 8B EC C7 46	02+  endProgram:		 push 0
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 2
 crackme.asm
 
 
 
-     58	0153  33 C9						 xor cx, cx
-     59	0155  BE 0128r						 lea si, bufferData
+     58	      0000 5D
+     59	0256  07						 pop es
      60
-     61	0158  B4 01		     @@nextChar:		 mov ah, 01h
-     62	015A  CD 21						 int 21h
-     63	015C  3C 0D						 cmp al, ENTER_ASCII_CODE
-     64	015E  74 06						 je @@end
-     65
-     66	0160  88 04						 mov [si], al
-     67	0162  46						 inc si
-     68	0163  41						 inc cx
-     69	0164  EB F2						 jmp @@nextChar
-     70
-     71	0166			     @@end:
-     72	0166  C3						 ret
-     73	0167			     getPassword		 endp
-     74				     ;----------------------------------------------------------------------------------------------
-     75				     ;Gets a string from standard input	and writes it to the input buffer.
-     76				     ;Entry:
-     77				     ;Exit:
-     78				     ;Expected:
-     79				     ;Destroyed: ah, dx
-     80				     ;----------------------------------------------------------------------------------------------
-     81
+     61	0257  BB 0084						 mov bx, 4*21h
+     62	025A  FA						 cli
+     63	025B  A1 047Ar						 mov ax, old21ofs
+     64	025E  26: 89 07						 mov es:[bx], ax
+     65	0261  A1 047Cr						 mov ax, old21seg
+     66	0264  26: 89 47	02					 mov es:[bx+2],	ax
+     67	0268  FB						 sti
+     68
+     69	0269  B8 4C00						 mov ax, 4c00h
+     70	026C  CD 21						 int 21h
+     71
+     72
+     73	026E			     getPassword		 proc
+     74
+     75	026E  33 C9						 xor cx, cx
+     76	0270  BE 0128r						 lea si, bufferData
+     77
+     78	0273  B4 01		     @@nextChar:		 mov ah, 01h
+     79	0275  CD 21						 int 21h
+     80	0277  3C 0D						 cmp al, ENTER_ASCII_CODE
+     81	0279  74 06						 je @@end
      82
-     83	0167			     getStringHash		 proc
-     84
-     85	0167  32 FF						 xor bh, bh
-     86
-     87	0169  32 ED						 xor ch, ch
-     88	016B  B8 1505						 mov ax, 5381d
-     89
-     90	016E  8A 1C		     @@nextChar:		 mov bl, [si]
-     91	0170  03 C3						 add ax, bx
-     92	0172  D1 E8 D1 E8 D1 E8	D1+				 shr ax, 5h
-     93	      E8 D1 E8
-     94	017C  46						 inc si
-     95	017D  E2 EF						 loop @@nextChar
-     96
-     97	017F  C3						 ret
-     98	0180			     getStringHash		 endp
-     99				     ;----------------------------------------------------------------------------------------------
-    100				     ;Calculates string	hash.
-    101				     ;Entry: si	= string start address
-    102				     ;	     cl	= string length
-    103				     ;Exit:  ax	= string hash
-    104				     ;Expected:	clean direction	flag.
-    105				     ;Destroyed: ax, bx, dx, cx
-    106				     ;----------------------------------------------------------------------------------------------
-    107
-    108
-    109	0180			     cmpPasswords		 proc
-    110	0180  55						 push bp
-    111	0181  8B EC						 mov bp, sp
-    112	0183  83 EC 10						 sub sp, 16d
+     83	027B  88 04						 mov [si], al
+     84	027D  46						 inc si
+     85	027E  41						 inc cx
+     86	027F  EB F2						 jmp @@nextChar
+     87
+     88	0281			     @@end:
+     89	0281  C3						 ret
+     90	0282			     getPassword		 endp
+     91				     ;----------------------------------------------------------------------------------------------
+     92				     ;Gets a string from standard input	and writes it to the input buffer.
+     93				     ;Entry:
+     94				     ;Exit: cx = length	of input password
+     95				     ;Expected:
+     96				     ;Destroyed: ax, cx, si
+     97				     ;----------------------------------------------------------------------------------------------
+     98
+     99
+    100	0282			     getStringHash		 proc
+    101
+    102	0282  32 FF						 xor bh, bh
+    103
+    104	0284  32 ED						 xor ch, ch
+    105	0286  B8 1505						 mov ax, 5381d
+    106
+    107	0289  8A 1C		     @@nextChar:		 mov bl, [si]
+    108	028B  03 C3						 add ax, bx
+    109	028D  D1 E8 D1 E8 D1 E8	D1+				 shr ax, 5h
+    110	      E8 D1 E8
+    111	0297  46						 inc si
+    112	0298  E2 EF						 loop @@nextChar
     113
-    114	0186  BE 0128r						 lea si, bufferData
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 3
+    114	029A  C3						 ret
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 3
 crackme.asm
 
 
 
-    115	0189  8D 7E F0						 lea di, [bp-16d]
-    116	018C  8B 4E 04						 mov cx, [bp+4]
-    117	018F  32 ED						 xor ch, ch
-    118	0191  F3> A4						 rep movsb
-    119
-    120	0193  8B 4E 04						 mov cx, [bp+4]
-    121	0196  8D 76 F0						 lea si, [bp-16d]
-    122	0199  E8 FFCB						 call getStringHash
-    123
-    124	019C  8B D8						 mov bx, ax
+    115	029B			     getStringHash		 endp
+    116				     ;----------------------------------------------------------------------------------------------
+    117				     ;Calculates string	hash.
+    118				     ;Entry: si	= string start address
+    119				     ;	     cl	= string length
+    120				     ;Exit:  ax	= string hash
+    121				     ;Expected:	clean direction	flag.
+    122				     ;Destroyed: ax, bx, dx, cx
+    123				     ;----------------------------------------------------------------------------------------------
+    124
     125
-    126	019E  B1 08						 mov cl, PASSWORD_LENGTH
-    127	01A0  BE 0120r						 lea si, password
-    128	01A3  53						 push bx
-    129	01A4  E8 FFC0						 call getStringHash
-    130	01A7  5B						 pop bx
-    131
-    132	01A8  33 D2						 xor dx, dx
-    133	01AA  3B C3						 cmp ax, bx
-    134	01AC  75 19						 jne @@end
-    135
-    136	01AE  0E						 push cs
-    137	01AF  07						 pop es
-    138
-    139	01B0  0E						 push cs
-    140	01B1  1F						 pop ds
-    141
-    142	01B2  BE 0120r						 lea si, password
-    143	01B5  8D 7E F0						 lea di, [bp-16d]
-    144
-    145	01B8  32 ED						 xor ch, ch
-    146	01BA  8B 4E 04						 mov cx, [bp+4]
-    147	01BD  83 F9 08						 cmp cx, PASSWORD_LENGTH
-    148	01C0  75 05						 jne @@end
-    149
-    150	01C2  F3> A6						 repe cmpsb
-    151	01C4  75 01						 jne @@end
-    152	01C6  42						 inc dx
-    153
-    154	01C7  8B E5		     @@end:			 mov sp, bp
-    155	01C9  5D						 pop bp
-    156	01CA  C2 0002						 ret 2
-    157	01CD			     cmpPasswords		 endp
-    158				     ;----------------------------------------------------------------------------------------------
-    159				     ;
-    160				     ;Entry:
-    161				     ;Exit:
-    162				     ;Expected:
-    163				     ;Destroyed:
-    164				     ;----------------------------------------------------------------------------------------------
-    165
-    166
-    167	01CD			     printfFrame		 proc
-    168
-    169	01CD  E8 0004						 call printfFrameBackground
-    170
-    171	01D0  E8 0055						 call printfFrameForeground
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 4
+    126	029B			     cmpPasswords		 proc
+    127	029B  55						 push bp
+    128	029C  8B EC						 mov bp, sp
+    129
+    130	029E  33 C0						 xor ax, ax
+    131	02A0  8A 46 04						 mov byte ptr al, [bp +	4]
+    132	02A3  04 01						 add al, 1
+    133	02A5  2B E0						 sub sp, ax
+    134
+    135	02A7  BE 0128r						 lea si, bufferData
+    136	02AA  8B FC						 mov di, sp
+    137	02AC  8B 4E 04						 mov cx, [bp+4]
+    138	02AF  F3> A4						 rep movsb
+    139
+    140	02B1  8B 4E 04						 mov cx, [bp+4]
+    141	02B4  8B F4						 mov si, sp
+    142	02B6  E8 FFC9						 call getStringHash
+    143
+    144	02B9  8B D8						 mov bx, ax
+    145
+    146	02BB  B1 08						 mov cl, PASSWORD_LENGTH
+    147	02BD  BE 0120r						 lea si, password
+    148	02C0  53						 push bx
+    149	02C1  E8 FFBE						 call getStringHash
+    150	02C4  5B						 pop bx
+    151
+    152	02C5  33 D2						 xor dx, dx
+    153	02C7  3B C3						 cmp ax, bx
+    154	02C9  75 18						 jne @@end
+    155
+    156	02CB  0E						 push cs
+    157	02CC  07						 pop es
+    158
+    159	02CD  0E						 push cs
+    160	02CE  1F						 pop ds
+    161
+    162	02CF  BE 0120r						 lea si, password
+    163	02D2  8B FC						 mov di, sp
+    164
+    165	02D4  32 ED						 xor ch, ch
+    166	02D6  8B 4E 04						 mov cx, [bp+4]
+    167	02D9  83 F9 08						 cmp cx, PASSWORD_LENGTH
+    168	02DC  75 05						 jne @@end
+    169
+    170	02DE  F3> A6						 repe cmpsb
+    171	02E0  75 01						 jne @@end
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 4
 crackme.asm
 
 
 
-    172	01D3  C3						 ret
+    172	02E2  42						 inc dx
     173
-    174	01D4			     printfFrame		 endp
-    175				     ;----------------------------------------------------------------------------------------------
-    176				     ;Prints a centered	frame.
-    177				     ;Entry: al	= frame	color binary code
-    178				     ;	     dh	= the number of	lines in the message
-    179				     ;	     dl	= max length of	the string in the message
-    180				     ;Exit:
-    181				     ;Expected:	direction flag = 0, es contains	the address of the video memory	segment,
-    182				     ;		[82h] =	frame mode.
-    183				     ;Destroyed: ax, bx, cx, si, di
+    174	02E3  8B E5		     @@end:			 mov sp, bp
+    175	02E5  5D						 pop bp
+    176	02E6  C2 0002						 ret 2
+    177	02E9			     cmpPasswords		 endp
+    178				     ;----------------------------------------------------------------------------------------------
+    179				     ;Compares correct password	with password from input.
+    180				     ;Entry: cx	= length of input password.
+    181				     ;Exit: dx = correct password flag (== 1 if	correct, else == 0)
+    182				     ;Expected:	clean direction	flag.
+    183				     ;Destroyed: ax, bx, cx, dx, si, di
     184				     ;----------------------------------------------------------------------------------------------
     185
     186
-    187	01D4			     printfFrameBackground	     proc
-    188	01D4  50						     push ax
-    189	01D5  E8 0115						     call getFrameVideoMemoryOffset
-    190	01D8  58						     pop ax
-    191
-    192	01D9  33 DB						     xor bx, bx
-    193	01DB  8A DE						     mov bl, dh
-    194	01DD  80 C3 06						     add bl, 6
-    195
-    196	01E0  33 C9		     printfFrameStr:		     xor cx, cx
-    197	01E2  8A CA						     mov cl, dl
-    198	01E4  80 C1 06						     add cl, 6
-    199
-    200	01E7  E8 00C8						     call printfFrameBackgroundString
-    201
-    202	01EA  81 C7 00A0					     add di, 160d
-    203
-    204	01EE  50						     push ax
-    205	01EF  33 C0						     xor ax, ax
-    206	01F1  8A C2						     mov al, dl
-    207	01F3  98						     cbw
-    208	01F4  D1 E0						     shl ax, 1
-    209	01F6  2B F8						     sub di, ax
-    210	01F8  83 EF 0C						     sub di, 12
-    211	01FB  58						     pop ax
-    212
-    213	01FC  FE CB						     dec bl
-    214	01FE  80 FB 00						     cmp bl, 0
-    215	0201  75 DD						     jne printfFrameStr
-    216
-    217	0203  C3						     ret
-    218	0204			     printfFrameBackground	     endp
-    219				     ;----------------------------------------------------------------------------------------------
-    220				     ;Prints frame centered frame background depending
-    221				     ;on the number of lines and their length in the message
-    222				     ;Entry: dh	= the number of	lines in the message
-    223				     ;	     dl	= max length of	the string in the message
-    224				     ;	     al	= frame	color binary code
-    225				     ;Exit:
-    226				     ;Expected:
-    227				     ;Destroyed: bx, di, cl
-    228				     ;----------------------------------------------------------------------------------------------
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 5
+    187	02E9			     printfFrame		 proc
+    188
+    189	02E9  E8 0004						 call printfFrameBackground
+    190
+    191	02EC  E8 0055						 call printfFrameForeground
+    192	02EF  C3						 ret
+    193
+    194	02F0			     printfFrame		 endp
+    195				     ;----------------------------------------------------------------------------------------------
+    196				     ;Prints a centered	frame.
+    197				     ;Entry: al	= frame	color binary code
+    198				     ;	     dh	= the number of	lines in the message
+    199				     ;	     dl	= max length of	the string in the message
+    200				     ;Exit:
+    201				     ;Expected:	direction flag = 0, es contains	the address of the video memory	segment,
+    202				     ;		[82h] =	frame mode.
+    203				     ;Destroyed: ax, bx, cx, si, di
+    204				     ;----------------------------------------------------------------------------------------------
+    205
+    206
+    207	02F0			     printfFrameBackground	     proc
+    208	02F0  50						     push ax
+    209	02F1  E8 0115						     call getFrameVideoMemoryOffset
+    210	02F4  58						     pop ax
+    211
+    212	02F5  33 DB						     xor bx, bx
+    213	02F7  8A DE						     mov bl, dh
+    214	02F9  80 C3 06						     add bl, 6
+    215
+    216	02FC  33 C9		     printfFrameStr:		     xor cx, cx
+    217	02FE  8A CA						     mov cl, dl
+    218	0300  80 C1 06						     add cl, 6
+    219
+    220	0303  E8 00C8						     call printfFrameBackgroundString
+    221
+    222	0306  81 C7 00A0					     add di, 160d
+    223
+    224	030A  50						     push ax
+    225	030B  33 C0						     xor ax, ax
+    226	030D  8A C2						     mov al, dl
+    227	030F  98						     cbw
+    228	0310  D1 E0						     shl ax, 1
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 5
 crackme.asm
 
 
 
-    229
-    230
-    231	0204			     printHorizontalString   proc
-    232	0204  BB 0002					     mov bx, 2
-    233	0207  80 FC 00					     cmp ah, 0
-    234	020A  74 02					     je	@@nextElem
-    235	020C  F7 DB					     neg bx
+    229	0312  2B F8						     sub di, ax
+    230	0314  83 EF 0C						     sub di, 12
+    231	0317  58						     pop ax
+    232
+    233	0318  FE CB						     dec bl
+    234	031A  80 FB 00						     cmp bl, 0
+    235	031D  75 DD						     jne printfFrameStr
     236
-    237	020E  26: 88 05		     @@nextElem:	     mov byte ptr es:[di], al
-    238	0211  03 FB					     add di, bx
-    239	0213  E2 F9					     loop @@nextElem
-    240
-    241	0215  C3					     ret
-    242
-    243	0216			     printHorizontalString   endp
-    244				     ;----------------------------------------------------------------------------------------------
-    245				     ;Prints horizontal	string
-    246				     ;Entry: al	= symbol binary	code
-    247				     ;	     ah	= direction flag (a = 0, di += 2; a != 0, di -=	2)
-    248				     ;	     di	= video	memory offset
-    249				     ;	     cx	= length of string
-    250				     ;Exit:
-    251				     ;Expected:	es contains the	address	of the video memory segment.
-    252				     ;Destroyed: cx, bx
-    253				     ;----------------------------------------------------------------------------------------------
-    254
-    255	0216			     printVerticalString     proc
-    256	0216  BB 00A0					     mov bx, 80d*2
-    257	0219  80 FC 00					     cmp ah, 0
-    258	021C  74 02					     je	@@nextElem
-    259	021E  F7 DB					     neg bx
+    237	031F  C3						     ret
+    238	0320			     printfFrameBackground	     endp
+    239				     ;----------------------------------------------------------------------------------------------
+    240				     ;Prints frame centered frame background depending
+    241				     ;on the number of lines and their length in the message
+    242				     ;Entry: dh	= the number of	lines in the message
+    243				     ;	     dl	= max length of	the string in the message
+    244				     ;	     al	= frame	color binary code
+    245				     ;Exit:
+    246				     ;Expected:
+    247				     ;Destroyed: bx, di, cl
+    248				     ;----------------------------------------------------------------------------------------------
+    249
+    250
+    251	0320			     printHorizontalString   proc
+    252	0320  BB 0002					     mov bx, 2
+    253	0323  80 FC 00					     cmp ah, 0
+    254	0326  74 02					     je	@@nextElem
+    255	0328  F7 DB					     neg bx
+    256
+    257	032A  26: 88 05		     @@nextElem:	     mov byte ptr es:[di], al
+    258	032D  03 FB					     add di, bx
+    259	032F  E2 F9					     loop @@nextElem
     260
-    261	0220  26: 88 05		     @@nextElem:	     mov byte ptr es:[di], al
-    262	0223  03 FB					     add di, bx
-    263	0225  E2 F9					     loop @@nextElem
-    264
-    265	0227  C3					     ret
-    266
-    267	0228			     printVerticalString     endp
-    268				     ;----------------------------------------------------------------------------------------------
-    269				     ;Prints vertical string
-    270				     ;Entry: al	= symbol binary	code
-    271				     ;	     ah	= direction flag (ah = 0, di +=	80d*2; ah != 0,	di -= 80d*2)
-    272				     ;	     di	= video	memory offset
-    273				     ;	     cx	= length of string
-    274				     ;Exit:
-    275				     ;Expected:	es contains the	address	of the video memory segment.
-    276				     ;Destroyed: cx, bx
-    277				     ;----------------------------------------------------------------------------------------------
-    278
-    279
-    280	0228			     printfFrameForeground	     proc
-    281
-    282	0228  81 EF 0140					     sub di, 160*2
-    283	022C  83 C7 02						     add di, 2
+    261	0331  C3					     ret
+    262
+    263	0332			     printHorizontalString   endp
+    264				     ;----------------------------------------------------------------------------------------------
+    265				     ;Prints horizontal	string
+    266				     ;Entry: al	= symbol binary	code
+    267				     ;	     ah	= direction flag (a = 0, di += 2; a != 0, di -=	2)
+    268				     ;	     di	= video	memory offset
+    269				     ;	     cx	= length of string
+    270				     ;Exit:
+    271				     ;Expected:	es contains the	address	of the video memory segment.
+    272				     ;Destroyed: cx, bx
+    273				     ;----------------------------------------------------------------------------------------------
+    274
+    275	0332			     printVerticalString     proc
+    276	0332  BB 00A0					     mov bx, 80d*2
+    277	0335  80 FC 00					     cmp ah, 0
+    278	0338  74 02					     je	@@nextElem
+    279	033A  F7 DB					     neg bx
+    280
+    281	033C  26: 88 05		     @@nextElem:	     mov byte ptr es:[di], al
+    282	033F  03 FB					     add di, bx
+    283	0341  E2 F9					     loop @@nextElem
     284
-    285	022F  B0 C8						     mov al, 0C8h
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 6
+    285	0343  C3					     ret
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 6
 crackme.asm
 
 
 
-    286	0231  26: 88 05						     mov byte ptr es:[di], al
-    287
-    288	0234  83 C7 02						     add di, 2
-    289
-    290	0237  33 C9						     xor cx, cx
-    291	0239  8A CA						     mov cl, dl
-    292	023B  80 C1 02						     add cl, 2
-    293
-    294	023E  B0 CD						     mov al, 0CDh
-    295	0240  50						     push ax
-    296	0241  B4 00						     mov ah, 0
-    297	0243  E8 FFBE						     call printHorizontalString
-    298	0246  58						     pop ax
+    286
+    287	0344			     printVerticalString     endp
+    288				     ;----------------------------------------------------------------------------------------------
+    289				     ;Prints vertical string
+    290				     ;Entry: al	= symbol binary	code
+    291				     ;	     ah	= direction flag (ah = 0, di +=	80d*2; ah != 0,	di -= 80d*2)
+    292				     ;	     di	= video	memory offset
+    293				     ;	     cx	= length of string
+    294				     ;Exit:
+    295				     ;Expected:	es contains the	address	of the video memory segment.
+    296				     ;Destroyed: cx, bx
+    297				     ;----------------------------------------------------------------------------------------------
+    298
     299
-    300	0247  B0 BC						     mov al, 0BCh
-    301	0249  26: 88 05						     mov byte ptr es:[di], al
-    302
-    303	024C  8A C6						     mov al, dh
-    304	024E  04 03						     add al, 3
-    305	0250  50						     push ax
-    306	0251  98						     cbw
-    307	0252  BB 00A0						     mov bx, 160d
-    308	0255  52						     push dx
-    309	0256  F7 E3						     mul bx
-    310	0258  5A						     pop dx
-    311	0259  2B F8						     sub di, ax
-    312	025B  58						     pop ax
+    300	0344			     printfFrameForeground	     proc
+    301
+    302	0344  81 EF 0140					     sub di, 160*2
+    303	0348  83 C7 02						     add di, 2
+    304
+    305	034B  B0 C8						     mov al, 0C8h
+    306	034D  26: 88 05						     mov byte ptr es:[di], al
+    307
+    308	0350  83 C7 02						     add di, 2
+    309
+    310	0353  33 C9						     xor cx, cx
+    311	0355  8A CA						     mov cl, dl
+    312	0357  80 C1 02						     add cl, 2
     313
-    314	025C  B0 BB						     mov al, 0BBh
-    315	025E  26: 88 05						     mov byte ptr es:[di], al
-    316
-    317	0261  83 EF 02						     sub di, 2
-    318
-    319	0264  33 C9						     xor cx, cx
-    320	0266  8A CA						     mov cl, dl
-    321	0268  80 C1 02						     add cl, 2
+    314	035A  B0 CD						     mov al, 0CDh
+    315	035C  50						     push ax
+    316	035D  B4 00						     mov ah, 0
+    317	035F  E8 FFBE						     call printHorizontalString
+    318	0362  58						     pop ax
+    319
+    320	0363  B0 BC						     mov al, 0BCh
+    321	0365  26: 88 05						     mov byte ptr es:[di], al
     322
-    323	026B  B0 CD						     mov al, 0CDh
-    324	026D  50						     push ax
-    325	026E  B4 01						     mov ah, 1
-    326	0270  E8 FF91						     call printHorizontalString
-    327	0273  58						     pop ax
-    328
-    329	0274  B0 C9						     mov al, 0C9h
-    330	0276  26: 88 05						     mov byte ptr es:[di], al
-    331	0279  81 C7 00A0					     add di, 80d*2
-    332
+    323	0368  8A C6						     mov al, dh
+    324	036A  04 03						     add al, 3
+    325	036C  50						     push ax
+    326	036D  98						     cbw
+    327	036E  BB 00A0						     mov bx, 160d
+    328	0371  52						     push dx
+    329	0372  F7 E3						     mul bx
+    330	0374  5A						     pop dx
+    331	0375  2B F8						     sub di, ax
+    332	0377  58						     pop ax
     333
-    334	027D  8A CE						     mov cl, dh
-    335	027F  80 C1 02						     add cl, 2
+    334	0378  B0 BB						     mov al, 0BBh
+    335	037A  26: 88 05						     mov byte ptr es:[di], al
     336
-    337	0282  B0 BA						     mov al, 0BAh
-    338	0284  50						     push ax
-    339	0285  B4 00						     mov ah, 0
-    340	0287  E8 FF8C						     call printVerticalString
-    341	028A  58						     pop ax
+    337	037D  83 EF 02						     sub di, 2
+    338
+    339	0380  33 C9						     xor cx, cx
+    340	0382  8A CA						     mov cl, dl
+    341	0384  80 C1 02						     add cl, 2
     342
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 7
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 7
 crackme.asm
 
 
 
-    343	028B  81 EF 00A0					     sub di, 80d*2
-    344
-    345	028F  50						     push ax
-    346	0290  8A C2						     mov al, dl
-    347	0292  04 03						     add al, 3
-    348	0294  98						     cbw
-    349	0295  D1 E0						     shl ax, 1
-    350	0297  03 F8						     add di, ax
-    351	0299  58						     pop ax
+    343	0387  B0 CD						     mov al, 0CDh
+    344	0389  50						     push ax
+    345	038A  B4 01						     mov ah, 1
+    346	038C  E8 FF91						     call printHorizontalString
+    347	038F  58						     pop ax
+    348
+    349	0390  B0 C9						     mov al, 0C9h
+    350	0392  26: 88 05						     mov byte ptr es:[di], al
+    351	0395  81 C7 00A0					     add di, 80d*2
     352
-    353	029A  8A CE						     mov cl, dh
-    354	029C  80 C1 02						     add cl, 2
-    355
-    356	029F  B0 BA						     mov al, 0BAh
-    357	02A1  50						     push ax
-    358	02A2  B4 01						     mov ah, 1
-    359	02A4  E8 FF6F						     call printVerticalString
-    360	02A7  58						     pop ax
-    361
-    362	02A8  B0 00						     mov al, 0h
-    363	02AA  81 C7 00A0					     add di, 80d*2
-    364	02AE  E8 0006						     call printInternalFrame
-    365
-    366	02B1  C3						     ret
-    367	02B2			     printfFrameForeground	     endp
-    368				     ;----------------------------------------------------------------------------------------------
-    369				     ;Prints centered frame foreground depending
-    370				     ;on the number of lines and their length in the message
-    371				     ;Entry: dh	= the number of	lines in the message
-    372				     ;	     dl	= max length of	the string in the message
-    373				     ;	     di	= video	memory offset of the lower right corner	of the frame
-    374				     ;Exit:
-    375				     ;Expected:	es contains the	address	of the video memory segment.
-    376				     ;Destroyed: ax, bx, cx, si, di
-    377				     ;----------------------------------------------------------------------------------------------
-    378
-    379
-    380	02B2			     printfFrameBackgroundString	 proc
+    353
+    354	0399  8A CE						     mov cl, dh
+    355	039B  80 C1 02						     add cl, 2
+    356
+    357	039E  B0 BA						     mov al, 0BAh
+    358	03A0  50						     push ax
+    359	03A1  B4 00						     mov ah, 0
+    360	03A3  E8 FF8C						     call printVerticalString
+    361	03A6  58						     pop ax
+    362
+    363	03A7  81 EF 00A0					     sub di, 80d*2
+    364
+    365	03AB  50						     push ax
+    366	03AC  8A C2						     mov al, dl
+    367	03AE  04 03						     add al, 3
+    368	03B0  98						     cbw
+    369	03B1  D1 E0						     shl ax, 1
+    370	03B3  03 F8						     add di, ax
+    371	03B5  58						     pop ax
+    372
+    373	03B6  8A CE						     mov cl, dh
+    374	03B8  80 C1 02						     add cl, 2
+    375
+    376	03BB  B0 BA						     mov al, 0BAh
+    377	03BD  50						     push ax
+    378	03BE  B4 01						     mov ah, 1
+    379	03C0  E8 FF6F						     call printVerticalString
+    380	03C3  58						     pop ax
     381
-    382	02B2  47		     @@printfByte:			 inc di
-    383	02B3  AA							 stosb
-    384	02B4  E2 FC							 loop @@printfByte
+    382	03C4  B0 00						     mov al, 0h
+    383	03C6  81 C7 00A0					     add di, 80d*2
+    384	03CA  E8 0006						     call printInternalFrame
     385
-    386	02B6  C3							 ret
-    387	02B7			     printfFrameBackgroundString	 endp
+    386	03CD  C3						     ret
+    387	03CE			     printfFrameForeground	     endp
     388				     ;----------------------------------------------------------------------------------------------
-    389				     ;Prints frameBackground string a certain of color
-    390				     ;Entry: di	= starting address of the string
-    391				     ;	     al	= frame	color binary code
-    392				     ;	     cl	= length of the	string
-    393				     ;Exit:
-    394				     ;Expected:	es contains the	address	of the video memory segment.
-    395				     ;Destroyed: di, cl
-    396				     ;----------------------------------------------------------------------------------------------
-    397
+    389				     ;Prints centered frame foreground depending
+    390				     ;on the number of lines and their length in the message
+    391				     ;Entry: dh	= the number of	lines in the message
+    392				     ;	     dl	= max length of	the string in the message
+    393				     ;	     di	= video	memory offset of the lower right corner	of the frame
+    394				     ;Exit:
+    395				     ;Expected:	es contains the	address	of the video memory segment.
+    396				     ;Destroyed: ax, bx, cx, si, di
+    397				     ;----------------------------------------------------------------------------------------------
     398
-    399	02B7			     printInternalFrame		     proc
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 8
+    399
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 8
 crackme.asm
 
 
 
-    400
-    401	02B7  83 EF 02						     sub di, 2
-    402	02BA  8A CA						     mov cl, dl
-    403	02BC  80 C1 02						     add cl, 2
-    404	02BF  B4 01						     mov ah, 1
-    405	02C1  E8 FF40						     call printHorizontalString
-    406
-    407	02C4  83 C7 02						     add di, 2
-    408	02C7  8A CE						     mov cl, dh
-    409	02C9  80 C1 02						     add cl, 2
-    410	02CC  B4 00						     mov ah, 0
-    411	02CE  E8 FF45						     call printVerticalString
-    412
-    413	02D1  81 EF 00A0					     sub di, 2*80d
-    414	02D5  8A CA						     mov cl, dl
-    415	02D7  80 C1 02						     add cl, 2
-    416	02DA  B4 00						     mov ah, 0
-    417	02DC  E8 FF25						     call printHorizontalString
+    400	03CE			     printfFrameBackgroundString	 proc
+    401
+    402	03CE  47		     @@printfByte:			 inc di
+    403	03CF  AA							 stosb
+    404	03D0  E2 FC							 loop @@printfByte
+    405
+    406	03D2  C3							 ret
+    407	03D3			     printfFrameBackgroundString	 endp
+    408				     ;----------------------------------------------------------------------------------------------
+    409				     ;Prints frameBackground string a certain of color
+    410				     ;Entry: di	= starting address of the string
+    411				     ;	     al	= frame	color binary code
+    412				     ;	     cl	= length of the	string
+    413				     ;Exit:
+    414				     ;Expected:	es contains the	address	of the video memory segment.
+    415				     ;Destroyed: di, cl
+    416				     ;----------------------------------------------------------------------------------------------
+    417
     418
-    419	02DF  83 EF 02						     sub di, 2
-    420	02E2  8A CE						     mov cl, dh
-    421	02E4  80 C1 02						     add cl, 2
-    422	02E7  B4 01						     mov ah, 1
-    423	02E9  E8 FF2A						     call printVerticalString
-    424
-    425	02EC  C3						     ret
-    426	02ED			     printInternalFrame		     endp
-    427				     ;----------------------------------------------------------------------------------------------
-    428				     ;Prints centered internal frame foreground	depending
-    429				     ;on the number of lines and their length in the message
-    430				     ;Entry: al	= internal frame symbol	ascii-code
-    431				     ;	     dh	= the number of	lines in the message
-    432				     ;	     dl	= max length of	the string in the message
-    433				     ;	     di	= video	memory offset of the upper right corner	of the frame
-    434				     ;Exit:
-    435				     ;Expected:	es contains the	address	of the video memory segment.
-    436				     ;Destroyed: ax, cx, si, di
-    437				     ;----------------------------------------------------------------------------------------------
+    419	03D3			     printInternalFrame		     proc
+    420
+    421	03D3  83 EF 02						     sub di, 2
+    422	03D6  8A CA						     mov cl, dl
+    423	03D8  80 C1 02						     add cl, 2
+    424	03DB  B4 01						     mov ah, 1
+    425	03DD  E8 FF40						     call printHorizontalString
+    426
+    427	03E0  83 C7 02						     add di, 2
+    428	03E3  8A CE						     mov cl, dh
+    429	03E5  80 C1 02						     add cl, 2
+    430	03E8  B4 00						     mov ah, 0
+    431	03EA  E8 FF45						     call printVerticalString
+    432
+    433	03ED  81 EF 00A0					     sub di, 2*80d
+    434	03F1  8A CA						     mov cl, dl
+    435	03F3  80 C1 02						     add cl, 2
+    436	03F6  B4 00						     mov ah, 0
+    437	03F8  E8 FF25						     call printHorizontalString
     438
-    439
-    440	02ED			     getFrameVideoMemoryOffset	     proc
-    441
-    442	02ED  BF 0019						     mov di, 25
-    443	02F0  8A C6						     mov al, dh
-    444	02F2  98						     cbw
-    445	02F3  2B F8						     sub di, ax
-    446	02F5  D1 EF						     shr di, 1
-    447	02F7  83 EF 03						     sub di, 3d
-    448	02FA  B8 00A0						     mov ax, 160
-    449	02FD  52						     push dx
-    450	02FE  F7 E7						     mul di
-    451	0300  5A						     pop dx
-    452	0301  8B F8						     mov di, ax
-    453
-    454	0303  33 C0						     xor ax, ax
-    455	0305  8A C2						     mov al, dl
-    456	0307  98						     cbw
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 9
+    439	03FB  83 EF 02						     sub di, 2
+    440	03FE  8A CE						     mov cl, dh
+    441	0400  80 C1 02						     add cl, 2
+    442	0403  B4 01						     mov ah, 1
+    443	0405  E8 FF2A						     call printVerticalString
+    444
+    445	0408  C3						     ret
+    446	0409			     printInternalFrame		     endp
+    447				     ;----------------------------------------------------------------------------------------------
+    448				     ;Prints centered internal frame foreground	depending
+    449				     ;on the number of lines and their length in the message
+    450				     ;Entry: al	= internal frame symbol	ascii-code
+    451				     ;	     dh	= the number of	lines in the message
+    452				     ;	     dl	= max length of	the string in the message
+    453				     ;	     di	= video	memory offset of the upper right corner	of the frame
+    454				     ;Exit:
+    455				     ;Expected:	es contains the	address	of the video memory segment.
+    456				     ;Destroyed: ax, cx, si, di
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 9
 crackme.asm
 
 
 
-    457
-    458	0308  BB 0050						     mov bx, 80
-    459	030B  2B D8						     sub bx, ax
-    460	030D  83 EB 06						     sub bx, 6d
-    461	0310  D1 EB						     shr bx, 1
-    462	0312  D1 E3						     shl bx, 1
-    463	0314  03 FB						     add di, bx
-    464
-    465	0316  C3						     ret
-    466	0317			     getFrameVideoMemoryOffset	     endp
-    467				     ;----------------------------------------------------------------------------------------------
-    468				     ;Gets a video memory offset for frame background depending
-    469				     ;on the number of lines and their length in the message
-    470				     ;Entry: dh	= the number of	lines in the message
-    471				     ;	     dl	= max length of	the string in the message
-    472				     ;Exit:  di	= video	memory offset for frame	background
-    473				     ;Expected:
-    474				     ;Destroyed: ax, bx, di
-    475				     ;----------------------------------------------------------------------------------------------
-    476
+    457				     ;----------------------------------------------------------------------------------------------
+    458
+    459
+    460	0409			     getFrameVideoMemoryOffset	     proc
+    461
+    462	0409  BF 0019						     mov di, 25
+    463	040C  8A C6						     mov al, dh
+    464	040E  98						     cbw
+    465	040F  2B F8						     sub di, ax
+    466	0411  D1 EF						     shr di, 1
+    467	0413  83 EF 03						     sub di, 3d
+    468	0416  B8 00A0						     mov ax, 160
+    469	0419  52						     push dx
+    470	041A  F7 E7						     mul di
+    471	041C  5A						     pop dx
+    472	041D  8B F8						     mov di, ax
+    473
+    474	041F  33 C0						     xor ax, ax
+    475	0421  8A C2						     mov al, dl
+    476	0423  98						     cbw
     477
-    478	0317			     printfSuccessMessage	     proc
-    479
-    480	0317  B8 B800						     mov ax, 0b800h
-    481	031A  8E C0						     mov es, ax
-    482
-    483	031C  B0 AE						     mov al, MESSAGE_SUCCESS_COLOR
-    484	031E  B6 01						     mov dh, 1
-    485	0320  B2 0F						     mov dl, MESSAGE_SUCCESS_LENGTH
-    486
-    487	0322  E8 FEA8						     call printfFrame
-    488
-    489	0325  BF 07C0						     mov di, (12d * 80d	+ 32d) * 2
-    490
-    491	0328  BE 0103r						     lea si, messageSuccess
-    492	032B  B9 000F						     mov cx, MESSAGE_SUCCESS_LENGTH
-    493	032E  B4 AE						     mov ah, MESSAGE_SUCCESS_COLOR
-    494
-    495	0330			     @@print_char:
-    496	0330  AC						     lodsb
-    497	0331  AB						     stosw
-    498	0332  E2 FC						     loop @@print_char
+    478	0424  BB 0050						     mov bx, 80
+    479	0427  2B D8						     sub bx, ax
+    480	0429  83 EB 06						     sub bx, 6d
+    481	042C  D1 EB						     shr bx, 1
+    482	042E  D1 E3						     shl bx, 1
+    483	0430  03 FB						     add di, bx
+    484
+    485	0432  C3						     ret
+    486	0433			     getFrameVideoMemoryOffset	     endp
+    487				     ;----------------------------------------------------------------------------------------------
+    488				     ;Gets a video memory offset for frame background depending
+    489				     ;on the number of lines and their length in the message
+    490				     ;Entry: dh	= the number of	lines in the message
+    491				     ;	     dl	= max length of	the string in the message
+    492				     ;Exit:  di	= video	memory offset for frame	background
+    493				     ;Expected:
+    494				     ;Destroyed: ax, bx, di
+    495				     ;----------------------------------------------------------------------------------------------
+    496
+    497
+    498	0433			     printfSuccessMessage	     proc
     499
-    500	0334  E9 FE17						     jmp endProgram
-    501
-    502	0337  C3						     ret
-    503	0338			     printfSuccessMessage	     endp
-    504
-    505
-    506	0338			     printfFailMessage		  proc
-    507
-    508	0338  B8 B800						     mov ax, 0b800h
-    509	033B  8E C0						     mov es, ax
+    500	0433  B8 B800						     mov ax, 0b800h
+    501	0436  8E C0						     mov es, ax
+    502
+    503	0438  B0 AE						     mov al, MESSAGE_SUCCESS_COLOR
+    504	043A  B6 01						     mov dh, 1
+    505	043C  B2 0F						     mov dl, MESSAGE_SUCCESS_LENGTH
+    506
+    507	043E  E8 FEA8						     call printfFrame
+    508
+    509	0441  BF 07C0						     mov di, (12d * 80d	+ 32d) * 2
     510
-    511	033D  B0 CF						     mov al, MESSAGE_FAIL_COLOR
-    512	033F  B6 01						     mov dh, 1
-    513	0341  B2 0E						     mov dl, MESSAGE_FAIL_LENGTH
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 10
+    511	0444  BE 0103r						     lea si, messageSuccess
+    512	0447  B9 000F						     mov cx, MESSAGE_SUCCESS_LENGTH
+    513	044A  B4 AE						     mov ah, MESSAGE_SUCCESS_COLOR
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 10
 crackme.asm
 
 
 
     514
-    515	0343  E8 FE87						     call printfFrame
-    516
-    517	0346  BF 07C2						     mov di, (12d * 80d	+ 33d) * 2
-    518
-    519	0349  BE 0112r						     lea si, messageFail
-    520	034C  B9 000E						     mov cx, MESSAGE_FAIL_LENGTH
-    521	034F  B4 CF						     mov ah, MESSAGE_FAIL_COLOR
+    515	044C			     @@print_char:
+    516	044C  AC						     lodsb
+    517	044D  AB						     stosw
+    518	044E  E2 FC						     loop @@print_char
+    519
+    520	0450  B8 4C00						     mov ax, 4c00h
+    521	0453  CD 21						     int 21h
     522
-    523	0351			     @@print_char:
-    524	0351  AC						     lodsb
-    525	0352  AB						     stosw
-    526	0353  E2 FC						     loop @@print_char
-    527
-    528	0355  E9 FDF6						     jmp endProgram
-    529
-    530	0358  C3						     ret
-    531	0359			     printfFailMessage		     endp
-    532
-    533				     end	     Start
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 11
+    523	0455  E9 FDF4						     jmp endProgram
+    524
+    525	0458  C3						     ret
+    526	0459			     printfSuccessMessage	     endp
+    527				     ;----------------------------------------------------------------------------------------------
+    528				     ;Prints message "Access granted!" in a green centered frame.
+    529				     ;Entry:
+    530				     ;Exit:
+    531				     ;Expected:	clean direction	flag.
+    532				     ;Destroyed: ax, bx, cx, dx, si, di, es
+    533				     ;----------------------------------------------------------------------------------------------
+    534
+    535
+    536	0459			     printfFailMessage		     proc
+    537
+    538	0459  B8 B800						     mov ax, 0b800h
+    539	045C  8E C0						     mov es, ax
+    540
+    541	045E  B0 CF						     mov al, MESSAGE_FAIL_COLOR
+    542	0460  B6 01						     mov dh, 1
+    543	0462  B2 0E						     mov dl, MESSAGE_FAIL_LENGTH
+    544
+    545	0464  E8 FE82						     call printfFrame
+    546
+    547	0467  BF 07C2						     mov di, (12d * 80d	+ 33d) * 2
+    548
+    549	046A  BE 0112r						     lea si, messageFail
+    550	046D  B9 000E						     mov cx, MESSAGE_FAIL_LENGTH
+    551	0470  B4 CF						     mov ah, MESSAGE_FAIL_COLOR
+    552
+    553	0472			     @@print_char:
+    554	0472  AC						     lodsb
+    555	0473  AB						     stosw
+    556	0474  E2 FC						     loop @@print_char
+    557
+    558	0476  E9 FDD3						     jmp endProgram
+    559
+    560	0479  C3						     ret
+    561	047A			     printfFailMessage		     endp
+    562				     ;----------------------------------------------------------------------------------------------
+    563				     ;Prints message "Access denied!" in a red centered	frame.
+    564				     ;Entry:
+    565				     ;Exit:
+    566				     ;Expected:	clean direction	flag.
+    567				     ;Destroyed: ax, bx, cx, dx, si, di, es
+    568				     ;----------------------------------------------------------------------------------------------
+    569
+    570	047A  0000		     old21ofs		 dw 0
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 11
+crackme.asm
+
+
+
+    571	047C  0000		     old21seg		 dw 0
+    572
+    573				     end	     Start
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 12
 Symbol Table
 
 
@@ -589,20 +634,20 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "03/05/26"
+??DATE				  Text	 "03/10/26"
 ??FILENAME			  Text	 "crackme "
-??TIME				  Text	 "20:27:08"
+??TIME				  Text	 "17:25:35"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
-@@END				  Near	 DGROUP:0166
-@@END				  Near	 DGROUP:01C7
-@@NEXTCHAR			  Near	 DGROUP:0158
-@@NEXTCHAR			  Near	 DGROUP:016E
-@@NEXTELEM			  Near	 DGROUP:020E
-@@NEXTELEM			  Near	 DGROUP:0220
-@@PRINTFBYTE			  Near	 DGROUP:02B2
-@@PRINT_CHAR			  Near	 DGROUP:0330
-@@PRINT_CHAR			  Near	 DGROUP:0351
+@@END				  Near	 DGROUP:0281
+@@END				  Near	 DGROUP:02E3
+@@NEXTCHAR			  Near	 DGROUP:0273
+@@NEXTCHAR			  Near	 DGROUP:0289
+@@NEXTELEM			  Near	 DGROUP:032A
+@@NEXTELEM			  Near	 DGROUP:033C
+@@PRINTFBYTE			  Near	 DGROUP:03CE
+@@PRINT_CHAR			  Near	 DGROUP:044C
+@@PRINT_CHAR			  Near	 DGROUP:0472
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0101H
@@ -615,43 +660,45 @@ Symbol Name			  Type	 Value
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
 BUFFERDATA			  Byte	 DGROUP:0128
-CMPPASSWORDS			  Near	 DGROUP:0180
-ENDPROGRAM			  Near	 DGROUP:014E
+CMPPASSWORDS			  Near	 DGROUP:029B
+ENDPROGRAM			  Near	 DGROUP:024C
 ENTER_ASCII_CODE		  Number 000D
-GETFRAMEVIDEOMEMORYOFFSET	  Near	 DGROUP:02ED
-GETPASSWORD			  Near	 DGROUP:0153
-GETSTRINGHASH			  Near	 DGROUP:0167
-GRANT				  Near	 DGROUP:014B
-MAIN				  Near	 DGROUP:0137
+GETFRAMEVIDEOMEMORYOFFSET	  Near	 DGROUP:0409
+GETPASSWORD			  Near	 DGROUP:026E
+GETSTRINGHASH			  Near	 DGROUP:0282
+GRANT				  Near	 DGROUP:0249
+MAIN				  Near	 DGROUP:0228
 MESSAGEFAIL			  Byte	 DGROUP:0112
 MESSAGESUCCESS			  Byte	 DGROUP:0103
 MESSAGE_FAIL_COLOR		  Number 00CF
 MESSAGE_FAIL_LENGTH		  Number 000E
 MESSAGE_SUCCESS_COLOR		  Number 00AE
 MESSAGE_SUCCESS_LENGTH		  Number 000F
+OLD21OFS			  Word	 DGROUP:047A
+OLD21SEG			  Word	 DGROUP:047C
 PASSWORD			  Byte	 DGROUP:0120
 PASSWORD_LENGTH			  Number 0008
 PASSWORD_SUCCESS		  Number 0001
-PRINTFFAILMESSAGE		  Near	 DGROUP:0338
-PRINTFFRAME			  Near	 DGROUP:01CD
-PRINTFFRAMEBACKGROUND		  Near	 DGROUP:01D4
-PRINTFFRAMEBACKGROUNDSTRING	  Near	 DGROUP:02B2
-PRINTFFRAMEFOREGROUND		  Near	 DGROUP:0228
-PRINTFFRAMESTR			  Near	 DGROUP:01E0
-PRINTFSUCCESSMESSAGE		  Near	 DGROUP:0317
-PRINTHORIZONTALSTRING		  Near	 DGROUP:0204
-PRINTINTERNALFRAME		  Near	 DGROUP:02B7
-PRINTVERTICALSTRING		  Near	 DGROUP:0216
-START				  Near	 DGROUP:0100
-Turbo Assembler	 Version 4.1	    03/05/26 20:27:08	    Page 12
+PRINTFFAILMESSAGE		  Near	 DGROUP:0459
+PRINTFFRAME			  Near	 DGROUP:02E9
+PRINTFFRAMEBACKGROUND		  Near	 DGROUP:02F0
+PRINTFFRAMEBACKGROUNDSTRING	  Near	 DGROUP:03CE
+PRINTFFRAMEFOREGROUND		  Near	 DGROUP:0344
+PRINTFFRAMESTR			  Near	 DGROUP:02FC
+PRINTFSUCCESSMESSAGE		  Near	 DGROUP:0433
+PRINTHORIZONTALSTRING		  Near	 DGROUP:0320
+PRINTINTERNALFRAME		  Near	 DGROUP:03D3
+Turbo Assembler	 Version 4.1	    03/10/26 17:25:35	    Page 13
 Symbol Table
 
 
 
+PRINTVERTICALSTRING		  Near	 DGROUP:0332
+START				  Near	 DGROUP:0100
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  0359 Word	  Public  CODE
+  _TEXT				  16  047E Word	  Public  CODE
 
