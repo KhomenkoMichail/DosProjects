@@ -1,0 +1,71 @@
+Turbo Assembler	 Version 4.1	    03/05/26 23:54:12	    Page 1
+videot~1.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5	0100			     Start:
+      6
+      7	0100  50 55 8B EC C7 46	02+	 push 0
+      8	      0000 5D
+      9	010A  1F			 pop ds
+     10
+     11	010B  50 55 8B EC C7 46	02+	 push 0b800h
+     12	      B800 5D
+     13	0115  07			 pop es
+     14
+     15	0116  BE 0000			 mov si, 0h
+     16	0119  BF 0000			 mov di, 0h
+     17
+     18	011C  B9 FFFF			 mov cx, 0FFFFh
+     19
+     20	011F  8A 04		     next:    mov al, ds:[si]
+     21	0121  32 C1			      xor al, cl
+     22	0123  26: 88 05			      mov es:[di], al
+     23	0126  46			      inc si
+     24	0127  47			      inc di
+     25	0128  E2 F5			      loop next
+     26
+     27	012A  E4 60		     next2:  in	al, 60h
+     28	012C  3C 01			     cmp al, 1
+     29	012E  75 FA			     jne next2
+     30
+     31	0130  C3			 ret
+     32				     end Start
+Turbo Assembler	 Version 4.1	    03/05/26 23:54:12	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/05/26"
+??FILENAME			  Text	 "videot~1"
+??TIME				  Text	 "23:54:12"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 VIDEOT~1
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+NEXT				  Near	 DGROUP:011F
+NEXT2				  Near	 DGROUP:012A
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0131 Word	  Public  CODE
+

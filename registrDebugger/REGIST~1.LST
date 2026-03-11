@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 1
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 1
 regist~1.asm
 
 
@@ -60,7 +60,7 @@ regist~1.asm
      55
      56	011A			     registersDebugger09Int	 proc
      57	011A  50 53 57 06					 push ax bx di es
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 2
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 2
 regist~1.asm
 
 
@@ -122,7 +122,7 @@ regist~1.asm
     112	0185  07						 pop es
     113	0186  E8 04B4						 call copyFrame
     114	0189  B4 00						 mov ah, 0
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 3
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 3
 regist~1.asm
 
 
@@ -184,7 +184,7 @@ regist~1.asm
     169	01C4  CD 21						 int 21h
     170
     171	01C6  89 1E 034Dr					 mov old08ofs, bx
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 4
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 4
 regist~1.asm
 
 
@@ -246,7 +246,7 @@ regist~1.asm
     226	022B  26: C6 07	62					 mov byte ptr es:[bx], 'b'
     227	022F  26: C6 47	02 78					 mov byte ptr es:[bx+2], 'x'
     228	0234  8B 46 10						 mov ax, [bp+16]
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 5
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 5
 regist~1.asm
 
 
@@ -308,7 +308,7 @@ regist~1.asm
     283	02E1  8B 46 00						 mov ax, [bp]
     284	02E4  E8 006A						 call printfHexRegValue
     285
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 6
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 6
 regist~1.asm
 
 
@@ -370,7 +370,7 @@ regist~1.asm
     340				     ;and flags	in a frame at each tick	of the system timer.
     341				     ;Entry:
     342				     ;Exit:
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 7
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 7
 regist~1.asm
 
 
@@ -432,7 +432,7 @@ regist~1.asm
     397				     ;	     bx	= video	memory offset of the beginning of the inscription reduced by 6 bytes
     398				     ;	     (the first	6 bytes	are used to write the register name)
     399				     ;Exit:
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 8
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 8
 regist~1.asm
 
 
@@ -494,7 +494,7 @@ regist~1.asm
     454	0419  74 06					     je	@@zeroIF
     455	041B  26: C6 87	03C0 31				     mov byte ptr es:[bx + 80d*2*6], '1'
     456	0421			     @@zeroIF:
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 9
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 9
 regist~1.asm
 
 
@@ -556,7 +556,7 @@ regist~1.asm
     511	048F  83 EF 04					     sub di, 4d
     512	0492  B9 0006					     mov cx, 6h
     513	0495  E8 0001					     call printfVerticalString
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 10
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 10
 regist~1.asm
 
 
@@ -618,7 +618,7 @@ regist~1.asm
     568	04C6  33 C0						     xor ax, ax
     569	04C8  8A C2						     mov al, dl
     570	04CA  98						     cbw
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 11
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 11
 regist~1.asm
 
 
@@ -680,7 +680,7 @@ regist~1.asm
     625				     ;	     dl	= max length of	the string in the message
     626				     ;Exit:  di	= video	memory offset for frame	background
     627				     ;Expected:
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 12
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 12
 regist~1.asm
 
 
@@ -742,7 +742,7 @@ regist~1.asm
     682	0542  58						     pop ax
     683
     684	0543  B0 BB						     mov al, 0BBh
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 13
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 13
 regist~1.asm
 
 
@@ -804,7 +804,7 @@ regist~1.asm
     739	05A9			     printfFrameForeground	     endp
     740				     ;----------------------------------------------------------------------------------------------
     741				     ;Prints centered frame foreground depending
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 14
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 14
 regist~1.asm
 
 
@@ -866,7 +866,7 @@ regist~1.asm
     796	05E3  83 EF 02						     sub di, 2
     797	05E6  8A CE						     mov cl, dh
     798	05E8  80 C1 02						     add cl, 2
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 15
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 15
 regist~1.asm
 
 
@@ -928,7 +928,7 @@ regist~1.asm
     853				     ;Prints centered frame for	register debugger.
     854				     ;on the number of lines and their length in the message
     855				     ;Entry: al	= internal frame symbol	ascii-code
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 16
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 16
 regist~1.asm
 
 
@@ -990,7 +990,7 @@ regist~1.asm
     910	0674  8B 1C						 mov bx, ds:[si]
     911	0676  26: 3B 1D						 cmp bx, es:[di]
     912	0679  74 0D						 je  @@noChange
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 17
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 17
 regist~1.asm
 
 
@@ -1052,7 +1052,7 @@ regist~1.asm
     967	06C0  B9 0012					 mov cx, (NUM_OF_FRAME_ROWS - 1)
     968
     969	06C3  81 EE 00A0	     @@shadowColumn:	 sub si, 80d*2
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 18
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 18
 regist~1.asm
 
 
@@ -1114,7 +1114,7 @@ regist~1.asm
    1024	0712  8B 1C						 mov bx, ds:[si]
    1025	0714  26: 3B 1D						 cmp bx, es:[di]
    1026	0717  74 10						 je  @@noChangeInColumn
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 19
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 19
 regist~1.asm
 
 
@@ -1176,7 +1176,7 @@ regist~1.asm
    1081	0766  8B 46 04						 mov ax, [bp + 4d]
    1082	0769  2E: A3 0B5Cr					 mov cs:[regsArr + 16d], ax
    1083
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 20
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 20
 regist~1.asm
 
 
@@ -1238,7 +1238,7 @@ regist~1.asm
    1138	07F7  74 06						 je @@zeroIF
    1139	07F9  2E: C6 06	0B79r 01				 mov byte ptr cs:[flagsArr + 6], 1
    1140	07FF			     @@zeroIF:
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 21
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 21
 regist~1.asm
 
 
@@ -1300,7 +1300,7 @@ regist~1.asm
    1195	0852  B9 0007		     @@whiteBX:			 mov cx, REG_STRING_LEN
    1196	0855  E8 02C8						 call makeTextWhite
    1197	0858			     @@noChangeBX:
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 22
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 22
 regist~1.asm
 
 
@@ -1362,7 +1362,7 @@ regist~1.asm
    1252	08E8  2E: 80 3E	0B6Cr 01				 cmp cs:[regChanged + 6], 1h
    1253	08EE  74 11						 je @@whiteBP
    1254	08F0  8B 46 06						 mov ax, [bp + 6d]
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 23
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 23
 regist~1.asm
 
 
@@ -1424,7 +1424,7 @@ regist~1.asm
    1309	0986  74 0D						 je @@noChangeSS
    1310	0988  2E: C6 06	0B70r 01  +				 mov cs:[regChanged + 10d], 1h
    1311	      90
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 24
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 24
 regist~1.asm
 
 
@@ -1467,7 +1467,7 @@ regist~1.asm
    1347				     ;if it finds differences.
    1348				     ;Entry: bx	= video	memory offset of the start of register string
    1349				     ;Exit:
-   1350				     ;Expected:
+   1350				     ;Expected:	array regsArr contains saved flag values.
    1351				     ;Destroyed: cx
    1352				     ;----------------------------------------------------------------------------------------------
    1353
@@ -1486,7 +1486,7 @@ regist~1.asm
    1366	      90
    1367	09FD			     @@whiteCF:
    1368	09FD  B9 0003						 mov cx, FLAG_STRING_LEN
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 25
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 25
 regist~1.asm
 
 
@@ -1548,7 +1548,7 @@ regist~1.asm
    1423	0A89  8B D0						 mov dx, ax
    1424	0A8B  83 E2 04						 and dx, 0000000000000100b
    1425	0A8E  C1 EA 02						 shr dx, 2d
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 26
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 26
 regist~1.asm
 
 
@@ -1610,78 +1610,84 @@ regist~1.asm
    1480	0B1C  E8 0001						 call makeTextWhite
    1481	0B1F			     @@noChangeDF:
    1482	0B1F  C3						 ret
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 27
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 27
 regist~1.asm
 
 
 
    1483	0B20			     compareFlags		 endp
-   1484
-   1485
-   1486
-   1487
-   1488	0B20			     makeTextWhite		 proc
-   1489	0B20  53						 push bx
-   1490
-   1491
-   1492	0B21  26: C6 47	01 3F	     @@regString:		 mov byte ptr es:[bx + 1], WHITE_ON_CYAN_ATTRIBUTE
-   1493	0B26  83 C3 02						 add bx, 2d
-   1494	0B29  E2 F6						 loop @@regString
-   1495
-   1496	0B2B  5B						 pop bx
-   1497	0B2C  C3						 ret
-   1498	0B2D			     makeTextWhite		 endp
-   1499				     ;----------------------------------------------------------------------------------------------
-   1500				     ;Changes the color	of characters in the line to white color.
-   1501				     ;Entry: bx	= video	memory offset of the start of the string
-   1502				     ;	     cx	= length of the	string
-   1503				     ;Exit:
-   1504				     ;Expected:
-   1505				     ;Destroyed: cx
-   1506				     ;----------------------------------------------------------------------------------------------
-   1507
-   1508	0B2D			     initChangingArrs		 proc
-   1509	0B2D  32 C0						 xor al, al
-   1510	0B2F  33 FF						 xor di, di
-   1511
-   1512	0B31  B9 000D						 mov cx, 13d
+   1484				     ;----------------------------------------------------------------------------------------------
+   1485				     ;Compares current flags values with values	saved in buffer
+   1486				     ;and changes the color of characters in the register line to white	color
+   1487				     ;if it finds differences.
+   1488				     ;Entry: bx	= video	memory offset of the start of register string
+   1489				     ;Exit:
+   1490				     ;Expected:	array flagsArr contains	saved flag values.
+   1491				     ;Destroyed: cx
+   1492				     ;----------------------------------------------------------------------------------------------
+   1493
+   1494	0B20			     makeTextWhite		 proc
+   1495	0B20  53						 push bx
+   1496
+   1497
+   1498	0B21  26: C6 47	01 3F	     @@regString:		 mov byte ptr es:[bx + 1], WHITE_ON_CYAN_ATTRIBUTE
+   1499	0B26  83 C3 02						 add bx, 2d
+   1500	0B29  E2 F6						 loop @@regString
+   1501
+   1502	0B2B  5B						 pop bx
+   1503	0B2C  C3						 ret
+   1504	0B2D			     makeTextWhite		 endp
+   1505				     ;----------------------------------------------------------------------------------------------
+   1506				     ;Changes the color	of characters in the line to white color.
+   1507				     ;Entry: bx	= video	memory offset of the start of the string
+   1508				     ;	     cx	= length of the	string
+   1509				     ;Exit:
+   1510				     ;Expected:
+   1511				     ;Destroyed: cx
+   1512				     ;----------------------------------------------------------------------------------------------
    1513
-   1514	0B34  2E: 88 85	0B66r	     @@continue1:		 mov byte ptr cs:[regChanged + di], al
-   1515	0B39  47						 inc di
-   1516	0B3A  E2 F8						 loop @@continue1
+   1514	0B2D			     initChangingArrs		 proc
+   1515	0B2D  32 C0						 xor al, al
+   1516	0B2F  33 FF						 xor di, di
    1517
-   1518	0B3C  B9 0008						 mov cx, 8d
-   1519	0B3F  33 FF						 xor di, di
-   1520	0B41  2E: 88 85	0B7Br	     @@continue2:		 mov byte ptr cs:[flagsChanged + di], al
-   1521	0B46  47						 inc di
-   1522	0B47  E2 F8						 loop @@continue2
+   1518	0B31  B9 000D						 mov cx, 13d
+   1519
+   1520	0B34  2E: 88 85	0B66r	     @@continue1:		 mov byte ptr cs:[regChanged + di], al
+   1521	0B39  47						 inc di
+   1522	0B3A  E2 F8						 loop @@continue1
    1523
-   1524	0B49  C3						 ret
-   1525	0B4A			     initChangingArrs		 endp
-   1526				     ;----------------------------------------------------------------------------------------------
-   1527				     ;Inits arrays "regChanged"	and "flagsChanged" with	zeroes.
-   1528				     ;Entry:
-   1529				     ;Exit:
-   1530				     ;Expected:
-   1531				     ;Destroyed: al, di, cx
+   1524	0B3C  B9 0008						 mov cx, 8d
+   1525	0B3F  33 FF						 xor di, di
+   1526	0B41  2E: 88 85	0B7Br	     @@continue2:		 mov byte ptr cs:[flagsChanged + di], al
+   1527	0B46  47						 inc di
+   1528	0B47  E2 F8						 loop @@continue2
+   1529
+   1530	0B49  C3						 ret
+   1531	0B4A			     initChangingArrs		 endp
    1532				     ;----------------------------------------------------------------------------------------------
-   1533
-   1534	0B4A  00		     printfRegsFlag		 db  0
-   1535	0B4B  00		     saveRegsFlag		 db  0
-   1536	0B4C  0D*(0000)		     regsArr			 dw  13	dup(0)
-   1537	0B66  0D*(00)		     regChanged			 db  13	dup(0)
-   1538
-   1539	0B73  08*(00)		     flagsArr			 db  8 dup(0)
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 28
+   1533				     ;Inits arrays "regChanged"	and "flagsChanged" with	zeroes.
+   1534				     ;Entry:
+   1535				     ;Exit:
+   1536				     ;Expected:
+   1537				     ;Destroyed: al, di, cx
+   1538				     ;----------------------------------------------------------------------------------------------
+   1539
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 28
 regist~1.asm
 
 
 
-   1540	0B7B  08*(00)		     flagsChanged		 db  8 dup(0)
-   1541
-   1542	0B83			     endOfProgram:
-   1543				     end			 Start
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 29
+   1540	0B4A  00		     printfRegsFlag		 db  0
+   1541	0B4B  00		     saveRegsFlag		 db  0
+   1542	0B4C  0D*(0000)		     regsArr			 dw  13	dup(0)
+   1543	0B66  0D*(00)		     regChanged			 db  13	dup(0)
+   1544
+   1545	0B73  08*(00)		     flagsArr			 db  8 dup(0)
+   1546	0B7B  08*(00)		     flagsChanged		 db  8 dup(0)
+   1547
+   1548	0B83			     endOfProgram:
+   1549				     end			 Start
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 29
 Symbol Table
 
 
@@ -1689,9 +1695,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "03/01/26"
+??DATE				  Text	 "03/05/26"
 ??FILENAME			  Text	 "regist~1"
-??TIME				  Text	 "15:44:21"
+??TIME				  Text	 "21:57:22"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@ALREADYSAVED			  Near	 DGROUP:020E
@@ -1743,7 +1749,7 @@ Symbol Name			  Type	 Value
 @@SHADOWCOLUMN			  Near	 DGROUP:06C3
 @@SHADOWROW			  Near	 DGROUP:06B1
 @@WHITEAF			  Near	 DGROUP:0AC7
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 30
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 30
 Symbol Table
 
 
@@ -1805,7 +1811,7 @@ DRAW_BUFFER_VM_SEGMENT		  Number BD00
 ENDOFPROGRAM			  Near	 DGROUP:0B83
 ENDRESIDENTPROGRAM		  Near	 DGROUP:010E
 FLAGSARR			  Byte	 DGROUP:0B73
-Turbo Assembler	 Version 4.1	    03/01/26 15:44:22	    Page 31
+Turbo Assembler	 Version 4.1	    03/05/26 21:57:23	    Page 31
 Symbol Table
 
 

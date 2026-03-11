@@ -268,8 +268,8 @@ getFrameVideoMemoryOffset       endp
 
 printfFrameBackgroundString         proc
 
-@@printfByte:                       mov byte ptr es:[di+1], al
-                                    add di, 2
+@@printfByte:                       inc di
+                                    stosb
                                     loop @@printfByte
 
                                     ret
@@ -383,6 +383,10 @@ printfFrameForeground           proc
                                 sub di, 160*2
                                 add di, 2
 
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice1
+
                                 mov al, 0C8h
                                 cmp ah, 30h
                                 jne @@simpleChoice1
@@ -396,6 +400,10 @@ printfFrameForeground           proc
                                 mov cl, dl
                                 add cl, 2
 
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice2
+
                                 mov al, 0CDh
                                 cmp ah, 30h
                                 jne @@simpleChoice2
@@ -406,6 +414,10 @@ printfFrameForeground           proc
                                 mov ah, 0
                                 call printHorizontalString
                                 pop ax
+
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice3
 
                                 mov al, 0BCh
                                 cmp ah, 30h
@@ -425,6 +437,10 @@ printfFrameForeground           proc
                                 sub di, ax
                                 pop ax
 
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice4
+
                                 mov al, 0BBh
                                 cmp ah, 30h
                                 jne @@simpleChoice4
@@ -437,6 +453,11 @@ printfFrameForeground           proc
                                 xor cx, cx
                                 mov cl, dl
                                 add cl, 2
+
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice5
+
                                 mov al, 0CDh
                                 cmp ah, 30h
                                 jne @@simpleChoice5
@@ -448,6 +469,10 @@ printfFrameForeground           proc
                                 call printHorizontalString
                                 pop ax
 
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice6
+
                                 mov al, 0C9h
                                 cmp ah, 30h
                                 jne @@simpleChoice6
@@ -456,8 +481,14 @@ printfFrameForeground           proc
 @@simpleChoice6:                mov byte ptr es:[di], al
                                 add di, 80d*2
 
+
                                 mov cl, dh
                                 add cl, 2
+
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice7
+
                                 mov al, 0BAh
                                 cmp ah, 30h
                                 jne @@simpleChoice7
@@ -481,6 +512,11 @@ printfFrameForeground           proc
 
                                 mov cl, dh
                                 add cl, 2
+
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@simpleChoice8
+
                                 mov al, 0BAh
                                 cmp ah, 30h
                                 jne @@simpleChoice8
@@ -493,12 +529,27 @@ printfFrameForeground           proc
                                 pop ax
 
                                 add di, 2*80d
+
+                                mov al, 03h
+                                cmp ah, 38h
+                                je @@printfInternal
+
                                 mov al, 0h
                                 cmp ah, 30h
                                 jne @@printfInternal
                                 mov si, 88h
                                 lodsb
 @@printfInternal:               call printInternalFrame
+
+                                push ax cx si di dx
+
+                                add dh, 4h
+                                add dl, 4h
+                                sub di, (80d*2)
+                                add di, 6h
+                                call printInternalFrame
+
+                                pop dx di si cx ax
 
                                 ret
 printfFrameForeground           endp
@@ -545,11 +596,14 @@ processCommandLineMessage           proc
                                     sub cl, 3
 
                                     sub al, 30h
+                                    cmp al, 8d
+                                    je @@march8mode
                                     cmp al, 0
                                     jne @@simpleMode
                                     add si, 13d
                                     sub cl, 13d
 
+@@march8mode:
 @@simpleMode:                       push si
                                     call getMessageParams
                                     pop si
@@ -606,11 +660,11 @@ printInternalFrame              endp
 ;----------------------------------------------------------------------------------------------
 
 getFrameColor           proc
-                        mov al, 01110000b
+                        mov al, 70h    ;  =  01110000b
                         mov si, 82h
                         mov bl, [si]
                         cmp bl, 30h
-                        jne @@end
+                        jne @@MarchCompare
 
                         mov si, 8Eh
                         lodsb
@@ -626,6 +680,11 @@ getFrameColor           proc
                         jb @@less10_2
                         sub bl, 7d
 @@less10_2:             add al, bl
+                        jmp @@end
+
+@@MarchCompare:         cmp bl, 38h
+                        jne @@end
+                        mov al, 01000000b
 
 @@end:                  ret
 getFrameColor           endp

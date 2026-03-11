@@ -1314,7 +1314,7 @@ compareRegs                 endp
 ;if it finds differences.
 ;Entry: bx = video memory offset of the start of register string
 ;Exit:
-;Expected:
+;Expected: array regsArr contains saved flag values.
 ;Destroyed: cx
 ;----------------------------------------------------------------------------------------------
 
@@ -1440,9 +1440,15 @@ compareFlags                proc
 @@noChangeDF:
                             ret
 compareFlags                endp
-
-
-
+;----------------------------------------------------------------------------------------------
+;Compares current flags values with values saved in buffer
+;and changes the color of characters in the register line to white color
+;if it finds differences.
+;Entry: bx = video memory offset of the start of register string
+;Exit:
+;Expected: array flagsArr contains saved flag values.
+;Destroyed: cx
+;----------------------------------------------------------------------------------------------
 
 makeTextWhite               proc
                             push bx
@@ -1500,7 +1506,3 @@ flagsChanged                db  8 dup(0)
 
 endOfProgram:
 end                         Start
-
-
-
-

@@ -17,9 +17,9 @@ ENTER_ASCII_CODE            equ     0dh
 
 Start:
 
-                        jmp main
+                            jmp main
 
-
+requestMessage              db      "Please enter the password: ", 0Dh, 0Ah, '$'
 messageSuccess              db      "Access granted!"
 messageFail                 db      "Access denied."
 
@@ -29,6 +29,10 @@ bufferData                  db 256 dup(0)
 
 main:
                             cld
+
+                            mov ah, 09h
+                            mov dx, offset requestMessage
+                            int 21h
 
                             call getPassword
 
@@ -152,7 +156,7 @@ cmpPasswords                proc
 cmpPasswords                endp
 ;----------------------------------------------------------------------------------------------
 ;Compares correct password with password from input.
-;Entry: cx = length of input password.
+;Entry: [bp + 4] = length of input password.
 ;Exit: dx = correct password flag (== 1 if correct, else == 0)
 ;Expected: clean direction flag.
 ;Destroyed: ax, bx, cx, dx, si, di
@@ -358,6 +362,16 @@ printfFrameForeground           proc
                                 add di, 80d*2
                                 call printInternalFrame
 
+                                push ax cx si di dx
+
+                                add dh, 4h
+                                add dl, 4h
+                                sub di, (80d*2)
+                                add di, 6h
+                                call printInternalFrame
+
+                                pop dx di si cx ax
+
                                 ret
 printfFrameForeground           endp
 ;----------------------------------------------------------------------------------------------
@@ -537,8 +551,5 @@ printfFailMessage               endp
 ;Expected: clean direction flag.
 ;Destroyed: ax, bx, cx, dx, si, di, es
 ;----------------------------------------------------------------------------------------------
-
-old21ofs            dw 0
-old21seg            dw 0
 
 end             Start
