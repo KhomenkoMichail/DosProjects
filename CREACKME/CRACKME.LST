@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 1
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 1
 crackme.asm
 
 
@@ -60,7 +60,7 @@ crackme.asm
      55
      56	0260			     endProgram:
      57	0260  B8 4C00						 mov ax, 4c00h
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 2
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 2
 crackme.asm
 
 
@@ -122,7 +122,7 @@ crackme.asm
     112
     113
     114	0292			     cmpPasswords		 proc
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 3
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 3
 crackme.asm
 
 
@@ -184,7 +184,7 @@ crackme.asm
     169				     ;Exit: dx = correct password flag (== 1 if	correct, else == 0)
     170				     ;Expected:	clean direction	flag.
     171				     ;Destroyed: ax, bx, cx, dx, si, di
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 4
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 4
 crackme.asm
 
 
@@ -246,7 +246,7 @@ crackme.asm
     226	0317			     printfFrameBackground	     endp
     227				     ;----------------------------------------------------------------------------------------------
     228				     ;Prints frame centered frame background depending
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 5
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 5
 crackme.asm
 
 
@@ -308,7 +308,7 @@ crackme.asm
     283				     ;Expected:	es contains the	address	of the video memory segment.
     284				     ;Destroyed: cx, bx
     285				     ;----------------------------------------------------------------------------------------------
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 6
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 6
 crackme.asm
 
 
@@ -370,7 +370,7 @@ crackme.asm
     340
     341
     342	0390  8A CE						     mov cl, dh
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 7
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 7
 crackme.asm
 
 
@@ -432,7 +432,7 @@ crackme.asm
     397
     398	03DF			     printfFrameBackgroundString	 proc
     399
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 8
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 8
 crackme.asm
 
 
@@ -494,7 +494,7 @@ crackme.asm
     454				     ;Destroyed: ax, cx, si, di
     455				     ;----------------------------------------------------------------------------------------------
     456
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 9
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 9
 crackme.asm
 
 
@@ -556,7 +556,7 @@ crackme.asm
     511	045B  B4 AE						     mov ah, MESSAGE_SUCCESS_COLOR
     512
     513	045D			     @@print_char:
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 10
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 10
 crackme.asm
 
 
@@ -612,7 +612,7 @@ crackme.asm
     562				     ;----------------------------------------------------------------------------------------------
     563
     564				     end	     Start
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 11
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 11
 Symbol Table
 
 
@@ -622,7 +622,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "03/11/26"
 ??FILENAME			  Text	 "crackme "
-??TIME				  Text	 "22:01:56"
+??TIME				  Text	 "22:38:30"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@END				  Near	 DGROUP:0278
@@ -674,7 +674,7 @@ PRINTHORIZONTALSTRING		  Near	 DGROUP:0317
 PRINTINTERNALFRAME		  Near	 DGROUP:03E4
 PRINTVERTICALSTRING		  Near	 DGROUP:0329
 REQUESTMESSAGE			  Byte	 DGROUP:0103
-Turbo Assembler	 Version 4.1	    03/11/26 22:01:57	    Page 12
+Turbo Assembler	 Version 4.1	    03/11/26 22:38:30	    Page 12
 Symbol Table
 
 
