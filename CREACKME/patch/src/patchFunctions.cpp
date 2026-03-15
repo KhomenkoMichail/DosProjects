@@ -57,7 +57,7 @@ int changeAimFile (aimFile_t* aimFile, const char* patchFileName) {
 }
 
 void runGif(void) {
-    HDC screenShotsArr[NUM_OF_SCREENSHOTS] = {NULL};
+    HDC screenShotsArr[NUM_OF_SCREENSHOTS] = {};
     char fileName[100];
     int screenCounter = 0;
 

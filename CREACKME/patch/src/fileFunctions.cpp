@@ -63,9 +63,9 @@ long getSizeOfFile(FILE* file) {
 int rewriteAimFile(aimFile_t* aimFile) {
     assert(aimFile);
 
-    FILE* file = fopen("result.com", "wb");
+    FILE* file = fopen(aimFile->name, "wb");
     if (!file) {
-        fprintf(stderr, "Error of opening file \"%s\"", "result.com");
+        fprintf(stderr, "Error of opening file \"%s\"", aimFile->name);
         perror("");
         return 1;
     }
@@ -73,7 +73,7 @@ int rewriteAimFile(aimFile_t* aimFile) {
     fwrite(aimFile->bufferCopy, 1, aimFile->size, file);
 
     if (fclose(file) != 0) {
-        fprintf(stderr, "Error of closing file \"%s\"", "result.com");
+        fprintf(stderr, "Error of closing file \"%s\"", aimFile->name);
         perror("");
         return 1;
     }
