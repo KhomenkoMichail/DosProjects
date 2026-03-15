@@ -19,11 +19,11 @@ Start:
 
                             jmp main
 
+password                    db      26h, 3Ah, 33h, 3Ch, 39h, 0Bh, 3Dh, 27h
 requestMessage              db      "Please enter the password: ", 0Dh, 0Ah, '$'
 messageSuccess              db      "Access granted!"
 messageFail                 db      "Access denied."
 
-password                    db      "thankYou"
 
 bufferData                  db 256 dup(0)
 
@@ -35,6 +35,10 @@ main:
                             int 21h
 
                             call getPassword
+
+                            push cx
+                            call decipherPassword
+                            pop cx
 
                             push cx
                             call cmpPasswords
@@ -445,7 +449,6 @@ printInternalFrame              endp
 ;Destroyed: ax, cx, si, di
 ;----------------------------------------------------------------------------------------------
 
-
 getFrameVideoMemoryOffset       proc
 
                                 mov di, 25
@@ -551,5 +554,20 @@ printfFailMessage               endp
 ;Expected: clean direction flag.
 ;Destroyed: ax, bx, cx, dx, si, di, es
 ;----------------------------------------------------------------------------------------------
+
+decipherPassword        proc
+                        mov cx, PASSWORD_LENGTH
+
+                        lea si, password
+
+@@nextChar:             mov bl, 52h
+                        mov byte ptr al, [si]
+                        xor al, bl
+                        mov byte ptr [si], al
+                        inc si
+                        loop @@nextChar
+
+                        ret
+decipherPassword        endp
 
 end             Start

@@ -1,20 +1,21 @@
-# Educational task "CRACKME"
+# Учебный проект "CRACKME"
 
-[Русскоязычная версия](readmeRUS.md)
+[English version](README.md)
 
-## Description
-The program asks for a password. If the user enters the correct password, the phrase "access granted!" appears; otherwise the phrase "access denied." is displayed.
+## Описание
 
-The program contains two specially created vulnerabilities that cause the program to display the "access granted!" phrase when an incorrect password is entered.
+Программа запрашивает у пользователя пароль. Если он вводит правильный пароль, программа выводит
+фразу "access granted!", иначе фразу "access denied.".
 
-The educational task was to create such a program and to find vulnerabilities in your partner's program.
+Программа содержит две специально заложенные уязвимости, которые могут изменить поведение программы, чтобы она вывела "access granted!" при неправильном пароле.
 
-## My program
+Учебное задание заключалось в том, чтобы создать такую программу, а также найти две уязвимости и взломать программу напарника.
 
-You can see the code of my program in the file "creackme.asm".
+## Моя программа
 
-It displays a red frame with a message when an incorrect password is entered, and a green frame otherwise.
+Вы можете увидеть код моей программы в файле "creackme.asm".
 
+Она выводит красную рамку с фразой "access denied." при вводе неправильного пароля, и зеленую рамку с фразой "access granted!" в противном случае.
 
 <img width="1023" height="649" alt="image" src="https://github.com/user-attachments/assets/215533fd-5f20-43f7-87be-ae2c5cd71cef" />
 
@@ -22,11 +23,14 @@ It displays a red frame with a message when an incorrect password is entered, an
 <img width="1023" height="640" alt="image" src="https://github.com/user-attachments/assets/bb01b7be-2af3-4e51-b3f1-d1c1814e75f2" />
 
 
-### Program vulnerabilities:
-#### 1. Buffer overflow
-The password entered by the user is processed using 01 function of the 21 interrupt and is written into the buffer located before the program code.
+### Уязвимости программы:
+#### 1. Переполнение буфера
 
-The program doesn't check the length of the entered password. Therefore, the entered password could exceed the buffer and alter the program code, for example, replacing the password check with "NOP."
+Пароль, вводимый пользователем, обрабатывается с помощью 01 функции 21 прерывания и записывается в буфер, расположенный перед кодом программы.
+
+
+Программа не проверяет длину вводимого пароля. Поэтому введенный пароль может выйти за границы буфера и переписать следующий за ним код программы; например, заменив функцию проверки пароля
+на "NOP".
 
 ```
 bufferData                  db 256 dup(0)
@@ -54,13 +58,14 @@ endProgram:
                             int 21h
 ```
 
-#### 2. 8-bit register integer overflow
+#### 2. Целочисленное переполнение 8-битного регистра
 
-The function "cmpPasswords" uses stack-based argument passing in the Pascal declaration. The only argument it takes is the length of the string entered by the user. Then it allocates an array on the stack large enough to save the user's password.
+Функция "cmpPasswords" использует стековую передачу аргументов в Pascal соглашении. Единственный аргумент, который она принимает - длина строки пользовательского пароля. Затем она выделяет в стеке массив памяти, достаточный для сохранения в него пользовательского пароля.
 
-The password length is placed in the al register, which is incremented and subtracted from the sp register. The new sp value is used as the address to copy the user password from the buffer.
+Длина пароля помещается в регистр al, который затем инкрементируется и вычитается из текущего sp.
+Новое значение регистра sp используется как адрес по которому записывается пользовательский пароль.
 
-When entering a 255-character password, the al register overflows and no memory is allocated on the stack, while 255 bytes are copied from the password buffer using the sp pointer, which can change the function return address.
+При вводе 255-байтного пароля, регистр al переполняется и в стеке не выделяется память, при этом 255 байт копируется по старому sp, что может переписать адрес возврата функции.
 
 ```
 cmpPasswords                proc
@@ -116,82 +121,67 @@ cmpPasswords                proc
                             ret 2
 cmpPasswords                endp
 ```
-Input file that hacks the program:
+Входной файл который взламывает программу:
 
 
 <img width="1032" height="492" alt="image" src="https://github.com/user-attachments/assets/3d14905d-cb0e-4490-88d1-0f7e1b01afef" />
 
 
-The 02 and 03 bytes contain the address of the function "printfSuccessMessage" (little-endian). 0FFh byte - ASCII code of [Enter].
+02 и 03 байты содержат адрес функции "printfSuccessMessage" (little-endian). 0FFh байт - ASCII код [Enter].
 
-## Hacking a partner's program
-I received the file "krakra.com" from my colleague. I used IDA disassembler and here are my steps to crack his program:
+## Взлом программы напарника
 
-#### 1. Quick look
+Я получил файл "krakra.com" от моего напарника. Я использовал дизассемблер IDA и вот мои шаги по взлому его программы:
 
-By looking through the program code in IDA's text mode, I noticed data buffer embedded within the code. This reminded me of my buffer overflow vulnerability. Then I started looking for a function that handles user input. This was the first function in the program. It does not check the length of the entered password and writes it to the address of this buffer.
+#### 1. Первый взгляд
+
+Просмотрев дизассемблированый код программы в текстовом режиме IDA, я заметил буфер, помещенный в середину кода программы. Это напомнило мне мою первую уязвимость с переполнением буфера. Тогда я начал искать функцию получения входящего пароля, ей оказалась первая функция, вызываемая программой. Она не проверяет длину пользовательского пароля и записывает его в обнаруженный мной буфер.
 
 
 <img width="1695" height="1054" alt="image" src="https://github.com/user-attachments/assets/66642605-1d66-4d96-9386-cebe94377684" />
 
 
-To exploit this vulnerability, I created a file "vzlom2" containing 53 junk bytes (the difference between 018ch (the address of the function following the buffer) and 0157h (the address of the buffer's beginning)). I followed these by the "EB" byte (the command "JMP" byte code), and the "94" byte (the difference between the address of the output "access approved" phrase and the current IP address). I ended the file with the "0D" byte (the [Enter] ASCII code).
+Чтобы использовать эту уязвимость я создал файл "vzlom2", который содержал 53 мусорных байта
+(разность между 018ch (адрес следующий сразу за буфером) и 0157h (адрес начала буфера)). Далее я поместил байт "EB" (байт код команды "JMP") и байт "94" (разность между адресом вывода "access approved" и текущим IP адресом). В конце помещен байт "0D" ([Enter] ASCII код).
 
 
 <img width="1021" height="642" alt="image" src="https://github.com/user-attachments/assets/c49f9dd4-e5cd-49b5-8229-f96d2cee2fcf" />
 
 
-Using input redirection I got a success message:
+Воспользовавшись перенаправлением ввода я получил нужное сообщение:
 
 
 <img width="745" height="90" alt="image" src="https://github.com/user-attachments/assets/386af1fe-017c-4492-9f9b-17e64e1800c3" />
 
 
-#### 2. Finding a difficult vulnerability
+#### 2. Поиск сложной уязвимости
 
-To find a difficult vulnerability, I began to look through each function of the disassembled code. After the getting password function, the program contains two strange functions that, according to some incomprehensible logic, change the register values. At first I didn't understand what they were doing and continued viewing disassembled code.
+Чтобы найти сложную уязвимость, я начал внимательно просматривать каждую функцию программы.
+За функцией получения пользовательского ввода в программе содержатся две странные функции, которые, следуя непонятной логике, заменяют значения регистров. Сначала я не понял для чего они нужны и продолжил поиск уязвимости.
 
 
 <img width="1455" height="1310" alt="image" src="https://github.com/user-attachments/assets/53f2f40c-18fb-4f1e-8674-4d2698e4d913" />
 
-
-Next there are two calls to the function for obtaining password hashes (user and correct).
-
+Далее следуют два вызова функции, получающей хеш паролей. (правильного и пользовательского).
 
 <img width="1312" height="773" alt="image" src="https://github.com/user-attachments/assets/3eeedd60-5e51-4dd9-ad08-848c4498997a" />
 
 
-The address of the beginning of the string containing the password is getting by the function through the di register. When receiving the user password hash, the buffer address is moved to di explicitly, but before processing the correct password, a strange function follows.
+Хэш-функция принимает адрес начала строки через регистр di. Чтобы определить хэш пользовательского пароля, автор кода напрямую передает функции адрес буфера, однако перед получением хэша правильного пароля идут те самые непонятные функции:
 
 
 <img width="1449" height="327" alt="image" src="https://github.com/user-attachments/assets/f671fb8b-7ea6-4d97-8ed2-affdf8d37f44" />
 
 
-After reviewing the second function of the program several times, I noticed that the registers it modifies are not used anywhere else, and its only result is moving the value stored at the address contained in si to di. After this function call di must contain the address of the correct password to pass it to the function that calculates its hash. This means that the address of the correct password is located at address 017Ch, which is located immediately after the buffer with the incoming password.
+После внимательного просмотра этих функций, я заметил, что значения регистров, изменяемые ими нигде не используются, и единственный результат этих функций - перемещение значения хранящегося по адресу, помещенному в si в di. После вызова этих функций регистр di должен содержать адрес строки с правильным паролем программы, чтобы передать его функции, вычисляющей хэш. Это означает что адрес правильного пароля содержится по адресу 017Ch, который расположен сразу после буфера с пользовательским паролем.
 
-To exploit this vulnerability, I created a file "vzlom1" containing 37 junk bytes (the difference between 017Ch (the address which contains the address of correct password) and 0157h (the address of the buffer's beginning)). Next I wrote two bytes of the incoming password buffer address: "57" and "01" (little-endian). I ended the file with the "0D" byte (the [Enter] ASCII code).
+Чтобы воспользоваться уязвимостью, я создал файл "vzlom1", содержащий 37 мусорных байтов (разность между 017Ch (адрес по которому расположен адрес правильного пароля) и 0157h (адрес начала буфера с пользовательским паролем)). Дальше я поместил два байта адреса пользовательского пароля: "57" and "01" (little-endian). Я завершил файл байтом "0D" ([Enter] ASCII код).
 
 
 <img width="1016" height="645" alt="image" src="https://github.com/user-attachments/assets/afc1f257-3e39-4833-9e47-06c585c8d494" />
 
 
-With this input, the program calculates the hash of the user's password twice and compares it with itself. The check always passes and the program displays
-"access approved" :
+При таком вводе программа дважды вычисляет хэш пользовательского пароля и сравнивает два одинаковых значения. Проверка всегда проходит и выводится нужная фраза:
 
 
 <img width="750" height="88" alt="image" src="https://github.com/user-attachments/assets/00358047-cff4-4f64-9515-c2349f7295b0" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

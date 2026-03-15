@@ -1,0 +1,469 @@
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe, файл: C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h, строка: 13853, функция: bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int),
+
+Сообщение: Параметр "destImage" неверен. Возможно, этот холст не создан, или уже уничтожен, или не загрузилась картинка.
+
+#1: TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400], Instance: 0x00007FF7AE9C9050 (64-bit), Flags: Cmdre0, Thread: 0x6DB4 (Main), GetLastError(): 13 (РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РґР°РЅРЅС‹Рµ). 
+
+--------------------------------------------------
+Стек вызовов:
+
+# 0 0x00007FF7AE933ABC in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::_txError() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:11090
+# 1 0x00007FF7AE946ED0 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::txBitBlt() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:13853
+
+# 2 0x00007FF7AE9513F6 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: runGif() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/patchFunctions.cpp:82:
+
+     80: 
+     81:         if (screenShotsArr[curScreen] != NULL) {
+=>   82:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     83:         }
+     84: 
+
+# 3 0x00007FF7AE9206EE in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: main() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/main.cpp:12:
+
+     10: 
+     11:     txPlaySound("nokia_3310.wav", SND_ASYNC);
+=>   12:     runGif();
+     13: 
+     14:     aimFile_t aimFile = {};
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int) at C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h:13853:
+
+  13851:                HDC sourceImage, double xSource /*= 0*/, double ySource /*= 0*/, unsigned operation /*= SRCCOPY*/)
+  13852:     {
+=>13853: $1  if (_TX_HDC_FAILED (destImage))   return false;
+  13854: $   if (_TX_HDC_FAILED (sourceImage)) return false;
+  13855: 
+
+# 1 in void runGif() at patchFunctions.cpp:82:
+
+     80: 
+     81:         if (screenShotsArr[curScreen] != NULL) {
+=>   82:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     83:         }
+     84: 
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h
+Compiled:	Mar 15 2026 12:37:41, GNU g++ 13.2.0, std=201703L, MinGW-W64 Runtime 11.0.1 (alpha - rev. 0) 0000-00-00, 64-bit, DEBUG
+Started:	Mar 15 2026 12:37:47
+
+Run file:	C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe
+Directory:	C:\Users\Admin\Desktop\prodva\CRACKME\patch
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe, файл: C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h, строка: 13853, функция: bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int),
+
+Сообщение: Параметр "destImage" неверен. Возможно, этот холст не создан, или уже уничтожен, или не загрузилась картинка.
+
+#1: TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400], Instance: 0x00007FF62EC69050 (64-bit), Flags: Cmdre0, Thread: 0x70DC (Main), GetLastError(): 13 (РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РґР°РЅРЅС‹Рµ). 
+
+--------------------------------------------------
+Стек вызовов:
+
+# 0 0x00007FF62EBD3AFC in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::_txError() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:11090
+# 1 0x00007FF62EBE6F10 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::txBitBlt() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:13853
+
+# 2 0x00007FF62EBF1436 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: runGif() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/patchFunctions.cpp:82:
+
+     80: 
+     81:         if (screenShotsArr[curScreen] != NULL) {
+=>   82:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     83:         }
+     84: 
+
+# 3 0x00007FF62EBC072C in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: main() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/main.cpp:14:
+
+     12: 
+     13:     txCreateWindow(1280, 666);
+=>   14:     runGif();
+     15: 
+     16:     aimFile_t aimFile = {};
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int) at C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h:13853:
+
+  13851:                HDC sourceImage, double xSource /*= 0*/, double ySource /*= 0*/, unsigned operation /*= SRCCOPY*/)
+  13852:     {
+=>13853: $1  if (_TX_HDC_FAILED (destImage))   return false;
+  13854: $   if (_TX_HDC_FAILED (sourceImage)) return false;
+  13855: 
+
+# 1 in void runGif() at patchFunctions.cpp:82:
+
+     80: 
+     81:         if (screenShotsArr[curScreen] != NULL) {
+=>   82:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     83:         }
+     84: 
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h
+Compiled:	Mar 15 2026 12:39:59, GNU g++ 13.2.0, std=201703L, MinGW-W64 Runtime 11.0.1 (alpha - rev. 0) 0000-00-00, 64-bit, DEBUG
+Started:	Mar 15 2026 12:40:05
+
+Run file:	C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe
+Directory:	C:\Users\Admin\Desktop\prodva\CRACKME\patch
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe, файл: C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h, строка: 13853, функция: bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int),
+
+Сообщение: Параметр "destImage" неверен. Возможно, этот холст не создан, или уже уничтожен, или не загрузилась картинка.
+
+#1: TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400], Instance: 0x00007FF656609050 (64-bit), Flags: Cmdre0, Thread: 0x646C (Main), GetLastError(): 13 (РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РґР°РЅРЅС‹Рµ). 
+
+--------------------------------------------------
+Стек вызовов:
+
+# 0 0x00007FF656573B2C in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::_txError() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:11090
+# 1 0x00007FF656586F40 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::txBitBlt() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:13853
+
+# 2 0x00007FF6565914ED in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: runGif() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/patchFunctions.cpp:84:
+
+     82: 
+     83:         if (screenShotsArr[curScreen] != NULL) {
+=>   84:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     85:         }
+     86: 
+
+# 3 0x00007FF656560758 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: main() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/main.cpp:15:
+
+     13:     txCreateWindow(1280, 666);
+     14:     txSleep(10);
+=>   15:     runGif();
+     16: 
+     17:     aimFile_t aimFile = {};
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int) at C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h:13853:
+
+  13851:                HDC sourceImage, double xSource /*= 0*/, double ySource /*= 0*/, unsigned operation /*= SRCCOPY*/)
+  13852:     {
+=>13853: $1  if (_TX_HDC_FAILED (destImage))   return false;
+  13854: $   if (_TX_HDC_FAILED (sourceImage)) return false;
+  13855: 
+
+# 1 in void runGif() at patchFunctions.cpp:84:
+
+     82: 
+     83:         if (screenShotsArr[curScreen] != NULL) {
+=>   84:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     85:         }
+     86: 
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h
+Compiled:	Mar 15 2026 12:43:44, GNU g++ 13.2.0, std=201703L, MinGW-W64 Runtime 11.0.1 (alpha - rev. 0) 0000-00-00, 64-bit, DEBUG
+Started:	Mar 15 2026 12:43:49
+
+Run file:	C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe
+Directory:	C:\Users\Admin\Desktop\prodva\CRACKME\patch
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe, файл: C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h, строка: 13853, функция: bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int),
+
+Сообщение: Параметр "destImage" неверен. Возможно, этот холст не создан, или уже уничтожен, или не загрузилась картинка.
+
+#1: TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400], Instance: 0x00007FF656609050 (64-bit), Flags: Cmdre0, Thread: 0x744C (Main), GetLastError(): 13 (РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РґР°РЅРЅС‹Рµ). 
+
+--------------------------------------------------
+Стек вызовов:
+
+# 0 0x00007FF656573B2C in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::_txError() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:11090
+# 1 0x00007FF656586F40 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::txBitBlt() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:13853
+
+# 2 0x00007FF6565914ED in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: runGif() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/patchFunctions.cpp:84:
+
+     82: 
+     83:         if (screenShotsArr[curScreen] != NULL) {
+=>   84:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     85:         }
+     86: 
+
+# 3 0x00007FF656560758 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: main() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/main.cpp:15:
+
+     13:     txCreateWindow(1280, 666);
+     14:     txSleep(10);
+=>   15:     runGif();
+     16: 
+     17:     aimFile_t aimFile = {};
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int) at C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h:13853:
+
+  13851:                HDC sourceImage, double xSource /*= 0*/, double ySource /*= 0*/, unsigned operation /*= SRCCOPY*/)
+  13852:     {
+=>13853: $1  if (_TX_HDC_FAILED (destImage))   return false;
+  13854: $   if (_TX_HDC_FAILED (sourceImage)) return false;
+  13855: 
+
+# 1 in void runGif() at patchFunctions.cpp:84:
+
+     82: 
+     83:         if (screenShotsArr[curScreen] != NULL) {
+=>   84:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     85:         }
+     86: 
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h
+Compiled:	Mar 15 2026 12:43:44, GNU g++ 13.2.0, std=201703L, MinGW-W64 Runtime 11.0.1 (alpha - rev. 0) 0000-00-00, 64-bit, DEBUG
+Started:	Mar 15 2026 12:46:37
+
+Run file:	C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe
+Directory:	C:\Users\Admin\Desktop\prodva\CRACKME\patch
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe, файл: C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h, строка: 13853, функция: bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int),
+
+Сообщение: Параметр "destImage" неверен. Возможно, этот холст не создан, или уже уничтожен, или не загрузилась картинка.
+
+#1: TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400], Instance: 0x00007FF7C4659050 (64-bit), Flags: Cmdre0, Thread: 0x2E80 (Main), GetLastError(): 13 (РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РґР°РЅРЅС‹Рµ). 
+
+--------------------------------------------------
+Стек вызовов:
+
+# 0 0x00007FF7C45C3B2C in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::_txError() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:11090
+# 1 0x00007FF7C45D6F40 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::txBitBlt() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:13853
+
+# 2 0x00007FF7C45E14ED in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: runGif() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/patchFunctions.cpp:84:
+
+     82: 
+     83:         if (screenShotsArr[curScreen] != NULL) {
+=>   84:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     85:         }
+     86: 
+
+# 3 0x00007FF7C45B0758 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: main() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/main.cpp:15:
+
+     13:     txCreateWindow(1280, 666);
+     14:     txSleep(10);
+=>   15:     runGif();
+     16: 
+     17:     aimFile_t aimFile = {};
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int) at C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h:13853:
+
+  13851:                HDC sourceImage, double xSource /*= 0*/, double ySource /*= 0*/, unsigned operation /*= SRCCOPY*/)
+  13852:     {
+=>13853: $1  if (_TX_HDC_FAILED (destImage))   return false;
+  13854: $   if (_TX_HDC_FAILED (sourceImage)) return false;
+  13855: 
+
+# 1 in void runGif() at patchFunctions.cpp:84:
+
+     82: 
+     83:         if (screenShotsArr[curScreen] != NULL) {
+=>   84:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     85:         }
+     86: 
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h
+Compiled:	Mar 15 2026 12:48:44, GNU g++ 13.2.0, std=201703L, MinGW-W64 Runtime 11.0.1 (alpha - rev. 0) 0000-00-00, 64-bit, DEBUG
+Started:	Mar 15 2026 12:48:58
+
+Run file:	C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe
+Directory:	C:\Users\Admin\Desktop\prodva\CRACKME\patch
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe, файл: C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h, строка: 13853, функция: bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int),
+
+Сообщение: Параметр "destImage" неверен. Возможно, этот холст не создан, или уже уничтожен, или не загрузилась картинка.
+
+#1: TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400], Instance: 0x00007FF715509050 (64-bit), Flags: Cmdre0, Thread: 0x6F4C (Main), GetLastError(): 13 (РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РґР°РЅРЅС‹Рµ). 
+
+--------------------------------------------------
+Стек вызовов:
+
+# 0 0x00007FF715473B2C in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::_txError() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:11090
+# 1 0x00007FF715486F40 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::txBitBlt() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:13853
+
+# 2 0x00007FF715491549 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: runGif() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/patchFunctions.cpp:92:
+
+     90:             }*/
+     91:             printf("txDC() = %p\n", txDC());
+=>   92:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     93:         }
+     94: 
+
+# 3 0x00007FF715460758 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: main() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/main.cpp:15:
+
+     13:     txCreateWindow(1280, 666);
+     14:     txSleep(10);
+=>   15:     runGif();
+     16: 
+     17:     aimFile_t aimFile = {};
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int) at C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h:13853:
+
+  13851:                HDC sourceImage, double xSource /*= 0*/, double ySource /*= 0*/, unsigned operation /*= SRCCOPY*/)
+  13852:     {
+=>13853: $1  if (_TX_HDC_FAILED (destImage))   return false;
+  13854: $   if (_TX_HDC_FAILED (sourceImage)) return false;
+  13855: 
+
+# 1 in void runGif() at patchFunctions.cpp:92:
+
+     90:             }*/
+     91:             printf("txDC() = %p\n", txDC());
+=>   92:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     93:         }
+     94: 
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h
+Compiled:	Mar 15 2026 12:53:10, GNU g++ 13.2.0, std=201703L, MinGW-W64 Runtime 11.0.1 (alpha - rev. 0) 0000-00-00, 64-bit, DEBUG
+Started:	Mar 15 2026 12:53:16
+
+Run file:	C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe
+Directory:	C:\Users\Admin\Desktop\prodva\CRACKME\patch
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe, файл: C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h, строка: 13853, функция: bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int),
+
+Сообщение: Параметр "destImage" неверен. Возможно, этот холст не создан, или уже уничтожен, или не загрузилась картинка.
+
+#1: TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400], Instance: 0x00007FF66B049050 (64-bit), Flags: Cmdre0, Thread: 0x5E34 (Main), GetLastError(): 13 (РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РґР°РЅРЅС‹Рµ). 
+
+--------------------------------------------------
+Стек вызовов:
+
+# 0 0x00007FF66AFB3B2C in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::_txError() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:11090
+# 1 0x00007FF66AFC6F40 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: (anonymous namespace)::TX::txBitBlt() at C:/Users/Admin/Downloads/CodeBlocks/TX/TXLib.h:13853
+
+# 2 0x00007FF66AFD1549 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: runGif() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/patchFunctions.cpp:92:
+
+     90:             }*/
+     91:             printf("txDC() = %p\n", txDC());
+=>   92:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     93:         }
+     94: 
+
+# 3 0x00007FF66AFA0758 in C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe: main() at C:/Users/Admin/Desktop/prodva/CRACKME/patch/main.cpp:15:
+
+     13:     txCreateWindow(1280, 666);
+     14:     txSleep(10);
+=>   15:     runGif();
+     16: 
+     17:     aimFile_t aimFile = {};
+
+--------------------------------------------------
+Стек вызовов TX:
+
+# 0 in bool {anonymous}::TX::txBitBlt(HDC, double, double, double, double, HDC, double, double, unsigned int) at C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h:13853:
+
+  13851:                HDC sourceImage, double xSource /*= 0*/, double ySource /*= 0*/, unsigned operation /*= SRCCOPY*/)
+  13852:     {
+=>13853: $1  if (_TX_HDC_FAILED (destImage))   return false;
+  13854: $   if (_TX_HDC_FAILED (sourceImage)) return false;
+  13855: 
+
+# 1 in void runGif() at patchFunctions.cpp:92:
+
+     90:             }*/
+     91:             printf("txDC() = %p\n", txDC());
+=>   92:             txBitBlt(txDC(), 0, 0, 1280, 666, screenShotsArr[curScreen], 0, 0);
+     93:         }
+     94: 
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 174, Date: 2025-08-17 06:00:49 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	C:\Users\Admin\Downloads\CodeBlocks\TX\TXLib.h
+Compiled:	Mar 15 2026 12:54:00, GNU g++ 13.2.0, std=201703L, MinGW-W64 Runtime 11.0.1 (alpha - rev. 0) 0000-00-00, 64-bit, DEBUG
+Started:	Mar 15 2026 12:54:05
+
+Run file:	C:\Users\Admin\Desktop\prodva\CRACKME\patch\patch.exe
+Directory:	C:\Users\Admin\Desktop\prodva\CRACKME\patch
+
+--------------------------------------------------

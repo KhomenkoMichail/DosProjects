@@ -1,0 +1,7 @@
+
+ Start  Stop   Length Name               Class
+
+ 00000H 00499H 0049AH _TEXT              CODE
+ 0049AH 0049AH 00000H _DATA              DATA
+
+
