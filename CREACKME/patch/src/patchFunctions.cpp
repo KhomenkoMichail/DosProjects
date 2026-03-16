@@ -56,39 +56,3 @@ int changeAimFile (aimFile_t* aimFile, const char* patchFileName) {
     return 0;
 }
 
-void runGif(void) {
-    HDC screenShotsArr[NUM_OF_SCREENSHOTS] = {};
-    char fileName[100];
-    int screenCounter = 0;
-
-    for (int num = 0; num < NUM_OF_SCREENSHOTS; num++) {
-        sprintf(fileName, "screensAndSound/screen%d.bmp", num);
-        screenShotsArr[num] = txLoadImage(fileName);
-        if (screenShotsArr[num] == NULL) {
-            printf("Failed to load: %s\n", fileName);
-            break;
-        }
-        screenCounter++;
-    }
-
-    if (screenCounter == 0) {
-        printf("No frames loaded\n");
-        return;
-    }
-
-    int curScreen = 0;
-    for (int i = 0; i < 25; i++) {
-        txSleep(150);
-
-        if (screenShotsArr[curScreen] != NULL) {
-            txBitBlt(txDC(), 0, 0, 1260, 1260, screenShotsArr[curScreen], 0, 0);
-        }
-
-        curScreen = (curScreen + 1) % screenCounter;
-    }
-}
-
-void createWindow (void) {
-        txCreateWindow(1260, 1260);
-}
-
