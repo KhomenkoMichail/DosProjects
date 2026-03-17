@@ -5,6 +5,7 @@
 
 #include "../include/patchFunctions.h"
 #include "../include/fileFunctions.h"
+#include "../include/graphicFunctions.h"
 
 int changeAimFile (aimFile_t* aimFile, const char* patchFileName) {
     assert(aimFile);
@@ -16,6 +17,15 @@ int changeAimFile (aimFile_t* aimFile, const char* patchFileName) {
         perror("");
         return 1;
     }
+
+    unsigned long long expectedFileHash = 0;
+    fscanf(patchFile, "%llu", &expectedFileHash);
+
+    if (expectedFileHash != getFileHash(aimFile->bufferCopy)) {
+        printf("Error! Invalid file hash!\n");
+        return 1;
+    }
+
 
     unsigned int newByte = 0;
     unsigned int offset = 0;
@@ -56,3 +66,24 @@ int changeAimFile (aimFile_t* aimFile, const char* patchFileName) {
     return 0;
 }
 
+int goPatchFunc (aimFile_t* aimFile, const char* patchFileName) {
+    assert(aimFile);
+    assert(patchFileName);
+
+    if (copyFileContent(aimFile))
+        return 1;
+
+    if (changeAimFile (aimFile, patchFileName)) {
+        free(aimFile->bufferCopy);
+        return 1;
+    }
+
+
+    txPlaySound("screensAndSound/nokia_3310.wav", SND_ASYNC);
+    runGif();
+
+    txPlaySound(NULL);
+    free(aimFile->bufferCopy);
+
+    return 0;
+}

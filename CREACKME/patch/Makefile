@@ -2,7 +2,7 @@ flags = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equa
 
 build-p:
 	@echo -------------------------------------------------------------------------
-	g++ src/main.cpp src/fileFunctions.cpp src/patchFunctions.cpp $(flags) -o build/patch.exe
+	g++ src/main.cpp src/fileFunctions.cpp src/patchFunctions.cpp src/graphicFunctions.cpp $(flags) -o build/patch.exe
 
 run:
 	./build/patch.exe

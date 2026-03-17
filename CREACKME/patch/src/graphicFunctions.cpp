@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <stdbool.h>
 
-#include "graphicFunctions.h"
+#include "../include/graphicFunctions.h"
 
 
 void drawButton (const button_t* button, bool isPressed) {
@@ -20,7 +20,7 @@ void drawButton (const button_t* button, bool isPressed) {
     Win32::RoundRect (txDC(), button->upperLeftCornerX, button->upperLeftCornerY,
                               button->upperLeftCornerX + button->sizeX,
                               button->upperLeftCornerY + button->sizeY,
-                              button->sizeX, button->sizeY);
+                              ROUNDING_RADIUS, ROUNDING_RADIUS);
 
     txDrawText (button->upperLeftCornerX, button->upperLeftCornerY,
                 button->upperLeftCornerX + button->sizeX,
@@ -31,8 +31,8 @@ void drawButton (const button_t* button, bool isPressed) {
 bool pointInButton (const button_t* button, double pointX, double pointY) {
     assert(button);
 
-    return (button->upperLeftX <= pointX && pointX <= (button->upperLeftX + button->sizeX)) &&
-           (button->upperLeftY <= pointY && pointY <= (button->upperLeftY + button->sizeY));
+    return (button->upperLeftCornerX <= pointX && pointX <= (button->upperLeftCornerX + button->sizeX)) &&
+           (button->upperLeftCornerY <= pointY && pointY <= (button->upperLeftCornerY + button->sizeY));
 }
 
 void drawButtons (const button_t buttonsArr[]) {
@@ -42,7 +42,7 @@ void drawButtons (const button_t buttonsArr[]) {
         drawButton(buttonsArr + i, false);
 }
 
-int selectButton (const button_t buttonsArr[]) {
+buttonId_t selectButton (const button_t buttonsArr[]) {
     assert(buttonsArr);
 
     while (! txGetAsyncKeyState (VK_ESCAPE)) {
@@ -54,9 +54,9 @@ int selectButton (const button_t buttonsArr[]) {
         if (!mouseIsPressed)
             continue;
 
-        for (int i = 0; buttons[i].text; i++)
-            if (pointInButton(buttons + i, x, y))
-                return buttons[i].id;
+        for (int i = 0; buttonsArr[i].text; i++)
+            if (pointInButton(buttonsArr + i, x, y))
+                return buttonsArr[i].id;
 
 
     }
@@ -89,7 +89,7 @@ void runGif(void) {
         txSleep(150);
 
         if (screenShotsArr[curScreen] != NULL) {
-            txBitBlt(txDC(), 0, 0, 1260, 1260, screenShotsArr[curScreen], 0, 0);
+            txBitBlt(txDC(), 0, 0, 1000, 750, screenShotsArr[curScreen], 0, 0);
         }
 
         curScreen = (curScreen + 1) % screenCounter;
@@ -97,7 +97,7 @@ void runGif(void) {
 }
 
 void createWindow (void) {
-        txCreateWindow(1260, 1260);
+        txCreateWindow(1000, 750);
 }
 
 buttonId_t showMenu (void) {
@@ -105,29 +105,30 @@ buttonId_t showMenu (void) {
     HDC menuBackground = txLoadImage("screensAndSound/menu.bmp");
     if (!menuBackground) {
             printf("Failed to load: %s\n", "screensAndSound/menu.bmp");
-            return 1;
+            return errorCode;
     }
 
-    txBitBlt(txDC(), 0, 0, 1260, 1260, menuBackground, 0, 0);
+    txBitBlt(txDC(), 0, 0, 1000, 750, menuBackground, 0, 0);
 
     button_t buttonsArr[NUM_OF_BUTTONS + 1] = {
-        {goPatch,   "PATCH", TX_LIGHTGREEN, TX_GREEN, 500, 100, 300, 100},
-        {skipPatch, "EXIT",  TX_LIGHTRED,   TX_RED,   700, 100, 300, 100},
+        {goPatch,   "PATCH", TX_LIGHTBLUE,  TX_BLUE,  650, 250, 550, 100},
+        {skipPatch, "EXIT",  TX_LIGHTRED,   TX_RED,   100, 250, 550, 100},
         {} };
 
     while (! txGetAsyncKeyState (VK_ESCAPE)) {
-        drawButtons (buttonsArr)
+        drawButtons (buttonsArr);
 
-        buttonId_t id = selectButton(buttonsArr);
+        buttonId_t buttonId = selectButton(buttonsArr);
 
-        if (id == goPatch)
+        if (buttonId == goPatch)
             drawButton(buttonsArr, true);
 
-        if (id == skipPatch)
+        if (buttonId == skipPatch)
             drawButton(buttonsArr + 1, true);
 
-        return id;
+        return buttonId;
     }
 
     return escape;
 }
+

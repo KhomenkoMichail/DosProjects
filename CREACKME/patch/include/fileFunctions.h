@@ -3,8 +3,10 @@
 
 int copyFileContent (aimFile_t* aimFile);
 
-long getSizeOfFile(FILE* file);
+long getSizeOfFile (FILE* file);
 
 int rewriteAimFile (aimFile_t* aimFile);
+
+unsigned long long getFileHash(const char* fileCopyBuffer);
 
 #endif

@@ -5,6 +5,7 @@
 #include "../include/patchFunctions.h"
 #include "../include/fileFunctions.h"
 
+
 int copyFileContent(aimFile_t* aimFile) {
     assert(aimFile);
 
@@ -79,4 +80,14 @@ int rewriteAimFile(aimFile_t* aimFile) {
     }
 
     return 0;
+}
+
+unsigned long long getFileHash(const char* fileCopyBuffer) {
+    assert(fileCopyBuffer);
+    unsigned long long hash = 5381;
+
+    for(ssize_t numOfElement = 0; fileCopyBuffer[numOfElement] != EOF; numOfElement++)
+        hash = ((hash << 5) + hash) + (unsigned long long)(fileCopyBuffer[numOfElement]);
+
+    return hash;
 }
